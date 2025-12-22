@@ -21,76 +21,33 @@
                     id="suggestion-icon"></i>
             </button>
 
-            <div id="suggestions-list" class="hidden">
-                <div class="p-2 grid grid-cols-1 gap-1 max-h-60 overflow-y-auto">
-                    <!-- Suggestion Items -->
-                    <div onclick="fillItem('Milk', 1, 7)"
-                        class="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer active:bg-gray-100 transition-colors border border-transparent hover:border-indigo-100 group">
-                        <div class="flex items-center">
-                            <div
-                                class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 text-xs">
-                                🥛</div>
-                            <div>
-                                <p class="font-medium text-gray-800 text-sm">Milk</p>
-                                <p class="text-xs text-gray-400"> Shelf: ~7 days</p>
-                            </div>
-                        </div>
-                        <button type="button"
-                            class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all shadow-sm">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
+            <div id="suggestions-list" class="hidden transition-all duration-300 ease-in-out">
+                <div
+                    class="p-2 grid grid-cols-1 gap-1 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                    <% /* suggestions passed from controller */ %>
 
-                    <div onclick="fillItem('Eggs', 1, 21)"
-                        class="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer active:bg-gray-100 transition-colors border border-transparent hover:border-indigo-100 group">
-                        <div class="flex items-center">
-                            <div
-                                class="w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center mr-3 text-xs">
-                                🥚</div>
-                            <div>
-                                <p class="font-medium text-gray-800 text-sm">Eggs</p>
-                                <p class="text-xs text-gray-400"> Shelf: ~21 days</p>
-                            </div>
-                        </div>
-                        <button type="button"
-                            class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all shadow-sm">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
 
-                    <div onclick="fillItem('Bread', 1, 5)"
-                        class="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer active:bg-gray-100 transition-colors border border-transparent hover:border-indigo-100 group">
-                        <div class="flex items-center">
-                            <div
-                                class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mr-3 text-xs">
-                                🍞</div>
-                            <div>
-                                <p class="font-medium text-gray-800 text-sm">Bread</p>
-                                <p class="text-xs text-gray-400"> Shelf: ~5 days</p>
+                        <% suggestions.forEach(function(item) { %>
+                            <div onclick="fillItem('<%= item.name %>', <%= item.qty %>, <%= item.shelf %>)"
+                                class="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer active:bg-gray-100 transition-colors border border-transparent hover:border-indigo-100 group">
+                                <div class="flex items-center">
+                                    <div
+                                        class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mr-3 text-sm">
+                                        <%= item.icon %>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-800 text-sm">
+                                            <%= item.name %>
+                                        </p>
+                                        <p class="text-xs text-gray-400"> Shelf: ~<%= item.shelf %> days</p>
+                                    </div>
+                                </div>
+                                <button type="button"
+                                    class="w-8 h-8 rounded-full bg-white border border-gray-200 text-indigo-600 flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all shadow-sm">
+                                    <i class="fas fa-plus"></i>
+                                </button>
                             </div>
-                        </div>
-                        <button type="button"
-                            class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all shadow-sm">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-
-                    <div onclick="fillItem('Bananas', 1, 4)"
-                        class="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer active:bg-gray-100 transition-colors border border-transparent hover:border-indigo-100 group">
-                        <div class="flex items-center">
-                            <div
-                                class="w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center mr-3 text-xs">
-                                🍌</div>
-                            <div>
-                                <p class="font-medium text-gray-800 text-sm">Bananas</p>
-                                <p class="text-xs text-gray-400"> Shelf: ~4 days</p>
-                            </div>
-                        </div>
-                        <button type="button"
-                            class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all shadow-sm">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
+                            <% }); %>
                 </div>
             </div>
         </div>
