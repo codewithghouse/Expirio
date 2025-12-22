@@ -92,6 +92,14 @@ exports.postRegister = async (req, res) => {
     }
 };
 
+exports.getProfile = (req, res) => {
+    res.render('auth/profile', {
+        title: 'Profile - Expirio',
+        user: req.user,
+        active: 'profile'
+    });
+};
+
 exports.logout = (req, res, next) => {
     req.logout((err) => {
         if (err) { return next(err); }

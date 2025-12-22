@@ -47,9 +47,30 @@
                         </div>
                         <% } %>
 
-                            <div class="min-h-screen bg-gray-100 flex flex-col">
-                                <!-- Inner wrapper from original header -->
-                                <nav class="bg-white border-b border-gray-200">
+                            <div class="min-h-screen bg-gray-100 flex flex-col pb-16 md:pb-0">
+                                <!-- Added padding bottom for mobile nav -->
+
+                                <!-- Mobile Header (Logo + Alerts) -->
+                                <nav class="bg-white border-b border-gray-200 md:hidden sticky top-0 z-30">
+                                    <div class="px-4 h-14 flex justify-between items-center">
+                                        <a href="/dashboard" class="flex items-center">
+                                            <span
+                                                class="text-xl font-bold text-emerald-600 tracking-tight">Expirio</span>
+                                        </a>
+                                        <% if(typeof user !='undefined' ) { %>
+                                            <a href="/alerts" class="relative p-2 text-gray-500 hover:text-emerald-600">
+                                                <i class="fas fa-bell text-lg"></i>
+                                                <% if(typeof stats !='undefined' && stats.unreadAlerts> 0) { %>
+                                                    <span
+                                                        class="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-white"></span>
+                                                    <% } %>
+                                            </a>
+                                            <% } %>
+                                    </div>
+                                </nav>
+
+                                <!-- Desktop Header (Original) -->
+                                <nav class="bg-white border-b border-gray-200 hidden md:block">
                                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                                         <div class="flex justify-between h-16">
                                             <div class="flex">
@@ -115,17 +136,6 @@
                                                         </a>
                                                     </div>
                                                 </div>
-
-                                                <!-- Mobile menu button -->
-                                                <div class="-mr-2 flex items-center sm:hidden">
-                                                    <button type="button"
-                                                        onclick="document.getElementById('mobile-menu').classList.toggle('hidden')"
-                                                        class="bg-white inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
-                                                        aria-controls="mobile-menu" aria-expanded="false">
-                                                        <span class="sr-only">Open main menu</span>
-                                                        <i class="fas fa-bars"></i>
-                                                    </button>
-                                                </div>
                                                 <% } else { %>
                                                     <div class="flex items-center space-x-4">
                                                         <a href="/auth/login"
@@ -135,43 +145,6 @@
                                                     </div>
                                                     <% } %>
                                         </div>
-                                    </div>
-
-                                    <!-- Mobile menu, show/hide based on menu state. -->
-                                    <div class="hidden sm:hidden" id="mobile-menu">
-                                        <% if(typeof user !='undefined' ) { %>
-                                            <div class="pt-2 pb-3 space-y-1">
-                                                <a href="/dashboard"
-                                                    class="bg-emerald-50 border-emerald-500 text-emerald-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Dashboard</a>
-                                                <a href="/inventory/fresh"
-                                                    class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Fresh</a>
-                                                <a href="/inventory/expiring"
-                                                    class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Expiring</a>
-                                                <a href="/alerts"
-                                                    class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Alerts</a>
-                                                <a href="/recipes"
-                                                    class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Recipes</a>
-                                                <a href="/plans"
-                                                    class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Pricing</a>
-                                            </div>
-                                            <div class="pt-4 pb-4 border-t border-gray-200">
-                                                <div class="flex items-center px-4">
-                                                    <div class="ml-3">
-                                                        <div class="text-base font-medium text-gray-800">
-                                                            <%= user.name %>
-                                                        </div>
-                                                        <div class="text-sm font-medium text-gray-500">
-                                                            <%= user.email %>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="mt-3 space-y-1">
-                                                    <a href="/auth/logout"
-                                                        class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">Sign
-                                                        out</a>
-                                                </div>
-                                            </div>
-                                            <% } %>
                                     </div>
                                 </nav>
                                 <main class="flex-grow">

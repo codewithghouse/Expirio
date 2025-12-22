@@ -12,6 +12,7 @@ router.post('/recipes/favorite', recipeController.postToggleFavorite);
 router.get('/recipes', recipeController.getRecipes);
 router.post('/recipes/generate', recipeController.postGenerateRecipes);
 router.get('/recipes/:id', recipeController.getRecipePage);
+router.get('/profile', require('../controllers/authController').getProfile);
 
 // Redirect root to dashboard (already handled in app.js but safety)
 router.get('/', (req, res) => res.redirect('/dashboard'));

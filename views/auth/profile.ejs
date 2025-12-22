@@ -1,0 +1,58 @@
+<%- include('../partials/header') %>
+
+    <div class="max-w-md mx-auto py-10 px-4 sm:px-6">
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="bg-emerald-600 h-24"></div>
+            <div class="px-6 pb-6 relative">
+                <div class="-mt-12 flex justify-center">
+                    <div class="h-24 w-24 rounded-full bg-white p-1 shadow-md">
+                        <div
+                            class="h-full w-full rounded-full bg-gray-200 flex items-center justify-center text-3xl font-bold text-gray-500">
+                            <%= user.name.charAt(0).toUpperCase() %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <h2 class="text-2xl font-bold text-gray-900">
+                        <%= user.name %>
+                    </h2>
+                    <p class="text-sm text-gray-500">
+                        <%= user.email %>
+                    </p>
+                </div>
+
+                <div class="mt-8 space-y-4">
+                    <div class="border-t border-gray-100 pt-4">
+                        <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Account</h3>
+
+                        <a href="/plans"
+                            class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
+                            <div class="flex items-center text-gray-700">
+                                <i class="fas fa-crown text-indigo-500 w-8"></i>
+                                <span class="font-medium">Subscription</span>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+                        </a>
+
+                        <a href="/settings"
+                            class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition opacity-50 cursor-not-allowed">
+                            <div class="flex items-center text-gray-700">
+                                <i class="fas fa-cog text-gray-400 w-8"></i>
+                                <span class="font-medium">Settings (Coming Soon)</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="border-t border-gray-100 pt-4">
+                        <a href="/auth/logout"
+                            class="block w-full py-3 px-4 bg-red-50 text-red-700 font-medium rounded-lg text-center hover:bg-red-100 transition">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Log Out
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/footer') %>
