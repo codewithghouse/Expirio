@@ -64,12 +64,12 @@
                 </div>
 
                 <% if (suggestions && suggestions.length > 0) { %>
-                    <!-- Container: Horizontal Scroll on Mobile (Carousel), Grid on Desktop (3 cols) -->
-                    <div class="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-8 md:grid md:grid-cols-3 md:gap-8 md:overflow-visible no-scrollbar-mobile p-1"> 
+                    <!-- Container: Responsive Grid from Mobile to Desktop -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-8 p-1"> 
 
                 <% suggestions.forEach(recipe => { %>
                     <!-- Recipe Card (Vertical Layout: Image Top) -->
-                    <div class="bg-white rounded-xl shadow-lg flex flex-col relative h-full transition-transform hover:-translate-y-1 hover:shadow-2xl overflow-hidden min-w-[85vw] sm:min-w-[45vw] md:min-w-0 snap-center border border-gray-100">
+                    <div class="bg-white rounded-xl shadow-lg flex flex-col relative h-full transition-transform hover:-translate-y-1 hover:shadow-2xl overflow-hidden border border-gray-100">
 
                         <!-- Image (Top) -->
                         <div class="relative h-56 flex-shrink-0 bg-gray-200">
