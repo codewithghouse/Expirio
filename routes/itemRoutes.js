@@ -7,6 +7,7 @@ router.use(ensureAuthenticated);
 
 router.get('/add', itemController.getAddItem);
 router.post('/add', itemController.postAddItem);
+router.post('/add-batch', itemController.postAddBatch);
 
 router.get('/fresh', itemController.getItems);
 router.get('/expiring', itemController.getItems);

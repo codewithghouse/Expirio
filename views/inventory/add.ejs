@@ -55,7 +55,22 @@
 
         <div class="bg-white shadow-lg rounded-xl overflow-hidden">
             <div class="p-5">
-                <form action="/inventory/add" method="POST" id="add-item-form">
+                <!-- Pending Items Container (Hidden when empty) -->
+                <div id="pending-container" class="mb-8 hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="text-lg font-bold text-gray-800">Pending Items (<span id="pending-count">0</span>)
+                        </h4>
+                        <button onclick="submitBatch()" id="submit-batch-btn"
+                            class="py-2 px-4 bg-emerald-600 text-white rounded-lg text-sm font-semibold shadow-md hover:bg-emerald-700 transition-colors">
+                            Add All Items
+                        </button>
+                    </div>
+                    <div id="pending-list" class="space-y-3">
+                        <!-- Pending Items Injected Here -->
+                    </div>
+                </div>
+
+                <form onsubmit="event.preventDefault(); addManualItem();" id="add-item-form">
 
                     <!-- Barcode Scanner Trigger & Manual Input -->
                     <div class="mb-6">
@@ -156,8 +171,8 @@
                     <!-- Submit Button -->
                     <div class="mt-8">
                         <button type="submit"
-                            class="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-md text-base font-semibold text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all active:scale-[0.98]">
-                            Save Item
+                            class="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-md text-base font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all active:scale-[0.98]">
+                            Add to List
                         </button>
                     </div>
                 </form>
@@ -191,34 +206,178 @@
     </div>
 
     <script>
+        let batchItems = [];
+
+        // Client-side Logic
+        function renderBatch() {
+            const container = document.getElementById('pending-container');
+            const list = document.getElementById('pending-list');
+            const countDisplay = document.getElementById('pending-count');
+
+            if (batchItems.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            countDisplay.innerText = batchItems.length;
+            list.innerHTML = '';
+
+            batchItems.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'bg-gray-50 rounded-lg p-3 border border-gray-200 flex flex-col gap-2';
+
+                div.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h5 class="font-bold text-gray-800 text-base">${item.name}</h5>
+                            <p class="text-xs text-gray-500">Shelf Life: ${item.shelfLife} days</p>
+                        </div>
+                        <button type="button" onclick="removeFromBatch(${index})" class="text-gray-400 hover:text-red-500 bg-white rounded-full p-1 border border-gray-100 shadow-sm">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3 mt-1">
+                        <!-- Qty Control -->
+                        <div class="flex items-center bg-white rounded-lg border border-gray-200">
+                             <button type="button" onclick="updateBatchItem(${index}, 'quantity', -1)" class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-red-500 active:bg-gray-50 rounded-l-lg touch-manipulation">
+                                <i class="fas fa-minus text-xs"></i>
+                            </button>
+                            <span class="flex-1 text-center text-sm font-bold text-gray-800">${item.quantity}</span>
+                            <button type="button" onclick="updateBatchItem(${index}, 'quantity', 1)" class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-emerald-500 active:bg-gray-50 rounded-r-lg touch-manipulation">
+                                <i class="fas fa-plus text-xs"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Age Control -->
+                        <div class="flex items-center bg-white rounded-lg border border-gray-200">
+                             <button type="button" onclick="updateBatchItem(${index}, 'daysOld', -1)" class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-red-500 active:bg-gray-50 rounded-l-lg touch-manipulation">
+                                <i class="fas fa-minus text-xs"></i>
+                            </button>
+                            <div class="flex-1 text-center leading-none">
+                                <span class="block text-sm font-bold text-gray-800">${item.daysOld}</span>
+                                <span class="block text-[10px] text-gray-400">days old</span>
+                            </div>
+                            <button type="button" onclick="updateBatchItem(${index}, 'daysOld', 1)" class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-emerald-500 active:bg-gray-50 rounded-r-lg touch-manipulation">
+                                <i class="fas fa-plus text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function addToBatch(item) {
+            // Check if same item already exists (same name & same shelf life & same age)
+            // Ideally we separate by unique item entry
+            // For simplicity, always add new entry if not exact duplicate
+            // But prompt says: "If item exists -> increment quantity"
+
+            const existingIndex = batchItems.findIndex(i => i.name === item.name && i.shelfLife == item.shelfLife && i.daysOld == item.daysOld);
+
+            if (existingIndex > -1) {
+                batchItems[existingIndex].quantity += 1;
+            } else {
+                batchItems.push(item);
+            }
+            renderBatch();
+        }
+
+        function updateBatchItem(index, field, delta) {
+            const item = batchItems[index];
+            if (field === 'quantity') {
+                item.quantity += delta;
+                if (item.quantity < 1) item.quantity = 1;
+            } else if (field === 'daysOld') {
+                item.daysOld += delta;
+                if (item.daysOld < 0) item.daysOld = 0;
+            }
+            renderBatch();
+        }
+
+        function removeFromBatch(index) {
+            batchItems.splice(index, 1);
+            renderBatch();
+        }
+
+        async function submitBatch() {
+            if (batchItems.length === 0) return;
+
+            try {
+                const response = await fetch('/inventory/add-batch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ items: batchItems })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    batchItems = [];
+                    renderBatch();
+                    // Just reload or redirect to inventory
+                    window.location.href = '/inventory/fresh';
+                } else {
+                    alert('Error saving items: ' + (result.message || 'Unknown error'));
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Network error while saving items.');
+            }
+        }
+
+        function addManualItem() {
+            const name = document.getElementById('name').value;
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            const shelfLife = parseInt(document.getElementById('shelfLife').value) || 7;
+            const daysOld = parseInt(document.getElementById('daysOld').value) || 0;
+
+            if (!name) {
+                alert("Please enter item name");
+                return;
+            }
+
+            addToBatch({ name, quantity, shelfLife, daysOld });
+
+            // Reset Name for next entry, optional reset others
+            document.getElementById('name').value = '';
+            document.getElementById('quantity').value = '1';
+            document.getElementById('quantityDisplay').innerText = '1';
+            document.getElementById('name').focus();
+        }
+
         // Quick Add Logic
         function fillItem(name, qty, shelf) {
-            document.getElementById('name').value = name;
+            // Directly add to batch instead of filling form
+            addToBatch({ name, quantity: parseInt(qty), shelfLife: parseInt(shelf), daysOld: 0 });
 
-            // Update Quantity Stepper
-            document.getElementById('quantity').value = qty;
-            document.getElementById('quantityDisplay').textContent = qty;
+            // Feedback
+            const container = document.getElementById('pending-container');
+            container.classList.remove('hidden');
+            // Small flash effect on container ?
+        }
 
-            document.getElementById('shelfLife').value = shelf;
+        // Manual helpers
+        function adjustQuantity(delta) {
+            const input = document.getElementById('quantity');
+            const display = document.getElementById('quantityDisplay');
+            let val = parseInt(input.value) || 1;
+            val += delta;
+            if (val < 1) val = 1;
+            input.value = val;
+            display.innerText = val;
+        }
 
-            // Visual feedback
-            const form = document.getElementById('add-item-form');
-            // Smooth scroll to form
-            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-            const nameField = document.getElementById('name');
-            nameField.classList.add('ring-2', 'ring-indigo-500', 'border-indigo-500');
-            setTimeout(() => {
-                nameField.classList.remove('ring-2', 'ring-indigo-500', 'border-indigo-500');
-            }, 800);
-
-            // Collapse suggestions
-            const suggestionsList = document.getElementById('suggestions-list');
-            const suggestionsIcon = document.getElementById('suggestion-icon');
-            if (!suggestionsList.classList.contains('hidden')) {
-                suggestionsList.classList.add('hidden');
-                suggestionsIcon.style.transform = 'rotate(0deg)';
-            }
+        function adjustAge(delta) {
+            const input = document.getElementById('daysOld');
+            const display = document.getElementById('daysOldDisplay');
+            let val = parseInt(input.value) || 0;
+            val += delta;
+            if (val < 0) val = 0;
+            input.value = val;
+            display.innerText = val;
         }
 
         // Toggle Suggestions
@@ -232,46 +391,16 @@
                     suggestionsList.classList.toggle('hidden');
                     suggestionsIcon.style.transform = suggestionsList.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
                 });
-                // Default open
                 suggestionsList.classList.remove('hidden');
                 suggestionsIcon.style.transform = 'rotate(180deg)';
             }
-        });
 
-        // Quantity Stepper Logic
-        function adjustQuantity(delta) {
-            const input = document.getElementById('quantity');
-            const display = document.getElementById('quantityDisplay');
-            let currentVal = parseInt(input.value) || 1;
-
-            let newVal = currentVal + delta;
-            if (newVal < 1) newVal = 1;
-
-            input.value = newVal;
-            display.textContent = newVal;
-        }
-
-        // Age Stepper Logic
-        function adjustAge(delta) {
-            const input = document.getElementById('daysOld');
-            const display = document.getElementById('daysOldDisplay');
-            let currentVal = parseInt(input.value) || 0;
-
-            let newVal = currentVal + delta;
-            if (newVal < 0) newVal = 0;
-
-            input.value = newVal;
-            display.textContent = newVal;
-        }
-
-        // Scanner Logic
-        document.addEventListener('DOMContentLoaded', () => {
+            // Scanner Stuff
             const startBtn = document.getElementById('start-scan-btn');
             const closeBtn = document.getElementById('close-scanner');
             const modal = document.getElementById('scanner-modal');
             const statusText = document.getElementById('scanner-status');
             const nameInput = document.getElementById('name');
-            const barcodeInput = document.getElementById('barcode');
 
             let html5QrcodeScanner = null;
             let isScanning = false;
@@ -329,6 +458,8 @@
                     modal.classList.add('hidden');
                 }
 
+                // If fallback input exists, fill it
+                const barcodeInput = document.getElementById('barcode');
                 if (barcodeInput) barcodeInput.value = decodedText;
 
                 // Visual loading state
@@ -341,10 +472,18 @@
                     const data = await response.json();
 
                     if (data.status === 1 && data.product.product_name) {
-                        nameInput.value = data.product.product_name;
-                        nameInput.scrollIntoView({ behavior: "smooth", block: "center" });
-                        nameInput.classList.add('ring-2', 'ring-emerald-500');
-                        setTimeout(() => nameInput.classList.remove('ring-2', 'ring-emerald-500'), 1000);
+                        const name = data.product.product_name;
+                        // Add directly to batch
+                        // Default qty 1, shelf life ? (use 7 default or try logic)
+
+                        addToBatch({
+                            name,
+                            quantity: 1,
+                            shelfLife: 7, // Default fallback
+                            daysOld: 0
+                        });
+
+                        alert(`Added "${name}" to pending list.`);
                     } else {
                         alert("Product scanned but details not found. Please enter name manually.");
                         nameInput.focus();

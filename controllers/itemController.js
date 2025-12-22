@@ -84,6 +84,40 @@ exports.postAddItem = async (req, res) => {
     }
 };
 
+exports.postAddBatch = async (req, res) => {
+    try {
+        const { items } = req.body; // Expecting { items: [{ name, quantity, shelfLife, daysOld }, ...] }
+
+        if (!items || !Array.isArray(items) || items.length === 0) {
+            return res.status(400).json({ success: false, message: 'No items provided' });
+        }
+
+        const itemsToInsert = items.map(item => {
+            const { name, quantity, shelfLife, daysOld } = item;
+            const { purchaseDate, expiryDate } = calculateDates(shelfLife, daysOld);
+            const status = determineStatus(expiryDate);
+
+            return {
+                name,
+                quantity,
+                shelfLife,
+                purchaseDate,
+                expiryDate,
+                status,
+                owner: req.user._id
+            };
+        });
+
+        const result = await Item.insertMany(itemsToInsert);
+
+        req.flash('success_msg', `${result.length} items added successfully`);
+        res.json({ success: true, count: result.length });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server Error during batch add' });
+    }
+};
+
 exports.getItems = async (req, res) => {
     try {
         // filter by status from route param or query
