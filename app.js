@@ -50,6 +50,7 @@ app.use(flash());
 // Global Variables Middleware
 app.use((req, res, next) => {
     res.locals.currentUser = req.user;
+    res.locals.user = req.user;
     res.locals.success_msg = req.flash('success_msg');
     res.locals.error_msg = req.flash('error_msg');
     res.locals.error = req.flash('error');

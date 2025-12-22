@@ -1,46 +1,44 @@
+</main>
+<footer class="bg-white border-t border-gray-200 mt-auto hidden md:block">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <p class="text-center text-sm text-gray-500">
+            &copy; <%= new Date().getFullYear() %> Expirio. Stop Food Waste.
+        </p>
+    </div>
+</footer>
+</div> <!-- Close inner wrapper -->
+
 <% if(typeof user !='undefined' ) { %>
     <!-- Mobile Bottom Navigation -->
-    <div
-        class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 z-50 px-4 pb-safe pt-2 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-        <div class="flex justify-between items-center text-xs font-medium text-gray-500">
-            <a href="/dashboard"
-                class="flex flex-col items-center py-2 px-1 w-16 hover:text-emerald-600 <%= typeof title !='undefined' && title.includes('Dashboard') ? 'text-emerald-600' : '' %>">
-                <i class="fas fa-home text-xl mb-1"></i>
-                <span>Home</span>
-            </a>
-            <a href="/inventory/fresh"
-                class="flex flex-col items-center py-2 px-1 w-16 hover:text-emerald-600 <%= typeof title !='undefined' && title.includes('Inventory') ? 'text-emerald-600' : '' %>">
-                <i class="fas fa-box text-xl mb-1"></i>
-                <span>Inventory</span>
-            </a>
-            <a href="/recipes"
-                class="flex flex-col items-center py-2 px-1 w-16 hover:text-emerald-600 <%= typeof title !='undefined' && title.includes('Recipes') ? 'text-emerald-600' : '' %>">
-                <i class="fas fa-utensils text-xl mb-1"></i>
-                <span>Recipes</span>
-            </a>
-            <a href="/recipes/favorites"
-                class="flex flex-col items-center py-2 px-1 w-16 hover:text-emerald-600 <%= typeof title !='undefined' && title.includes('Favorites') ? 'text-emerald-600' : '' %>">
-                <i class="fas fa-heart text-xl mb-1"></i>
-                <span>Favorites</span>
-            </a>
-            <a href="/profile"
-                class="flex flex-col items-center py-2 px-1 w-16 hover:text-emerald-600 <%= typeof title !='undefined' && title.includes('Profile') ? 'text-emerald-600' : '' %>">
-                <i class="fas fa-user text-xl mb-1"></i>
-                <span>Profile</span>
-            </a>
-        </div>
+    <div class="md:hidden fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 z-[9999] px-4 pb-safe pt-2 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] flex justify-between items-center text-xs font-medium text-gray-500 min-h-[60px]"
+        style="padding-bottom: env(safe-area-inset-bottom, 10px);">
+        <a href="/dashboard"
+            class="flex flex-col items-center py-2 px-1 w-16 hover:text-emerald-600 <%= typeof title !='undefined' && title.includes('Dashboard') ? 'text-emerald-600' : '' %>">
+            <i class="fas fa-home text-xl mb-1"></i>
+            <span>Home</span>
+        </a>
+        <a href="/inventory/fresh"
+            class="flex flex-col items-center py-2 px-1 w-16 hover:text-emerald-600 <%= typeof title !='undefined' && title.includes('Inventory') ? 'text-emerald-600' : '' %>">
+            <i class="fas fa-box text-xl mb-1"></i>
+            <span>Inventory</span>
+        </a>
+        <a href="/recipes"
+            class="flex flex-col items-center py-2 px-1 w-16 hover:text-emerald-600 <%= typeof title !='undefined' && title.includes('Recipes') ? 'text-emerald-600' : '' %>">
+            <i class="fas fa-utensils text-xl mb-1"></i>
+            <span>Recipes</span>
+        </a>
+        <a href="/recipes/favorites"
+            class="flex flex-col items-center py-2 px-1 w-16 hover:text-emerald-600 <%= typeof title !='undefined' && title.includes('Favorites') ? 'text-emerald-600' : '' %>">
+            <i class="fas fa-heart text-xl mb-1"></i>
+            <span>Favorites</span>
+        </a>
+        <a href="/profile"
+            class="flex flex-col items-center py-2 px-1 w-16 hover:text-emerald-600 <%= typeof title !='undefined' && title.includes('Profile') ? 'text-emerald-600' : '' %>">
+            <i class="fas fa-user text-xl mb-1"></i>
+            <span>Profile</span>
+        </a>
     </div>
     <% } %>
-
-        </main>
-        <footer class="bg-white border-t border-gray-200 mt-auto hidden md:block">
-            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                <p class="text-center text-sm text-gray-500">
-                    &copy; <%= new Date().getFullYear() %> Expirio. Stop Food Waste.
-                </p>
-            </div>
-        </footer>
-        </div> <!-- Close inner wrapper -->
 
         <script>
             // Auto-dismiss flash messages after 4 seconds
