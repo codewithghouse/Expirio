@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= typeof title !='undefined' ? title : 'Expirio' %>
+    </title>
+    <link href="/styles/output.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body class="bg-gray-50 font-sans text-gray-900 min-h-screen flex flex-col">
+
+    <!-- Flash Messages -->
+    <% if(typeof success_msg !='undefined' && success_msg !='' ){ %>
+        <div class="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded shadow-lg z-50 transition-opacity duration-500"
+            role="alert" id="success-alert">
+            <strong class="font-bold">Success!</strong>
+            <span class="block sm:inline">
+                <%= success_msg %>
+            </span>
+        </div>
+        <% } %>
+
+            <% if(typeof error_msg !='undefined' && error_msg !='' ){ %>
+                <div class="fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow-lg z-50 transition-opacity duration-500"
+                    role="alert" id="error-alert">
+                    <strong class="font-bold">Error!</strong>
+                    <span class="block sm:inline">
+                        <%= error_msg %>
+                    </span>
+                </div>
+                <% } %>
+
+                    <% if(typeof error !='undefined' && error !='' ){ %>
+                        <div class="fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow-lg z-50 transition-opacity duration-500"
+                            role="alert" id="passport-error">
+                            <strong class="font-bold">Error!</strong>
+                            <span class="block sm:inline">
+                                <%= error %>
+                            </span>
+                        </div>
+                        <% } %>
+
+                            <div class="min-h-screen bg-gray-100 flex flex-col">
+                                <!-- Inner wrapper from original header -->
+                                <nav class="bg-white border-b border-gray-200">
+                                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                        <div class="flex justify-between h-16">
+                                            <div class="flex">
+                                                <div class="flex-shrink-0 flex items-center">
+                                                    <a href="/dashboard" class="flex items-center">
+                                                        <span
+                                                            class="text-2xl font-bold text-emerald-600 tracking-tight">Expirio</span>
+                                                    </a>
+                                                </div>
+                                                <% if(typeof user !='undefined' ) { %>
+                                                    <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
+                                                        <a href="/dashboard"
+                                                            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                                            Dashboard
+                                                        </a>
+                                                        <a href="/inventory/fresh"
+                                                            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                                            Fresh
+                                                        </a>
+                                                        <a href="/inventory/expiring"
+                                                            class="border-transparent text-gray-500 hover:border-yellow-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                                            Expiring
+                                                        </a>
+                                                        <a href="/inventory/expired"
+                                                            class="border-transparent text-gray-500 hover:border-red-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                                            Expired
+                                                        </a>
+                                                        <a href="/alerts"
+                                                            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                                            Alerts
+                                                        </a>
+                                                        <a href="/recipes"
+                                                            class="border-transparent text-gray-500 hover:text-indigo-600 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                                            Recipes
+                                                        </a>
+                                                        <a href="/plans"
+                                                            class="border-transparent text-gray-500 hover:text-indigo-600 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                                            Pricing
+                                                        </a>
+                                                    </div>
+                                                    <% } %>
+                                            </div>
+                                            <% if(typeof user !='undefined' ) { %>
+                                                <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                                                    <a href="/alerts"
+                                                        class="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 relative">
+                                                        <span class="sr-only">View notifications</span>
+                                                        <i class="fas fa-bell"></i>
+                                                        <% if(typeof stats !='undefined' && stats.unreadAlerts> 0) { %>
+                                                            <span
+                                                                class="absolute top-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white bg-red-400"></span>
+                                                            <% } %>
+                                                    </a>
+
+                                                    <!-- Profile Dropdown -->
+                                                    <div class="ml-3 relative flex items-center space-x-4">
+                                                        <span class="text-sm font-medium text-gray-700">
+                                                            <%= user.name %>
+                                                        </span>
+                                                        <a href="/auth/logout"
+                                                            class="text-sm text-gray-500 hover:text-red-600 transition-colors">
+                                                            <i class="fas fa-sign-out-alt"></i> Logout
+                                                        </a>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Mobile menu button -->
+                                                <div class="-mr-2 flex items-center sm:hidden">
+                                                    <button type="button"
+                                                        onclick="document.getElementById('mobile-menu').classList.toggle('hidden')"
+                                                        class="bg-white inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+                                                        aria-controls="mobile-menu" aria-expanded="false">
+                                                        <span class="sr-only">Open main menu</span>
+                                                        <i class="fas fa-bars"></i>
+                                                    </button>
+                                                </div>
+                                                <% } else { %>
+                                                    <div class="flex items-center space-x-4">
+                                                        <a href="/auth/login"
+                                                            class="text-sm font-medium text-gray-500 hover:text-gray-900">Login</a>
+                                                        <a href="/auth/register"
+                                                            class="text-sm font-medium text-emerald-600 hover:text-emerald-500">Register</a>
+                                                    </div>
+                                                    <% } %>
+                                        </div>
+                                    </div>
+
+                                    <!-- Mobile menu, show/hide based on menu state. -->
+                                    <div class="hidden sm:hidden" id="mobile-menu">
+                                        <% if(typeof user !='undefined' ) { %>
+                                            <div class="pt-2 pb-3 space-y-1">
+                                                <a href="/dashboard"
+                                                    class="bg-emerald-50 border-emerald-500 text-emerald-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Dashboard</a>
+                                                <a href="/inventory/fresh"
+                                                    class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Fresh</a>
+                                                <a href="/inventory/expiring"
+                                                    class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Expiring</a>
+                                                <a href="/alerts"
+                                                    class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Alerts</a>
+                                                <a href="/recipes"
+                                                    class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Recipes</a>
+                                                <a href="/plans"
+                                                    class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Pricing</a>
+                                            </div>
+                                            <div class="pt-4 pb-4 border-t border-gray-200">
+                                                <div class="flex items-center px-4">
+                                                    <div class="ml-3">
+                                                        <div class="text-base font-medium text-gray-800">
+                                                            <%= user.name %>
+                                                        </div>
+                                                        <div class="text-sm font-medium text-gray-500">
+                                                            <%= user.email %>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-3 space-y-1">
+                                                    <a href="/auth/logout"
+                                                        class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">Sign
+                                                        out</a>
+                                                </div>
+                                            </div>
+                                            <% } %>
+                                    </div>
+                                </nav>
+                                <main class="flex-grow">

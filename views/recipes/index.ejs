@@ -1,0 +1,165 @@
+<%- include('../partials/header') %>
+
+  <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="px-4 sm:px-0">
+
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-2">
+        <h1 class="text-3xl font-bold text-gray-900">Smart Recipe Ideas</h1>
+        <a href="/recipes/favorites"
+          class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+          <i class="fas fa-heart text-red-500 mr-2"></i> My Favorites
+        </a>
+      </div>
+      <p class="text-gray-500 mb-8">Reduce waste by cooking with what you have.</p>
+
+      <!-- Inventory Summary -->
+      <div class="bg-white shadow sm:rounded-lg mb-8">
+        <div class="px-4 py-5 sm:p-6">
+          <h3 class="text-lg font-medium text-gray-900">Your Kitchen Inventory</h3>
+          <p class="mt-2 text-sm text-gray-500">
+            We found <strong>
+              <%= items.length %>
+            </strong> valid ingredients.
+          </p>
+
+          <div class="mt-4 flex flex-wrap gap-2">
+            <% items.forEach(item=> { %>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+              <%= item.status === 'expiring'
+                ? 'bg-yellow-100 text-yellow-800'
+                : 'bg-green-100 text-green-800' %>">
+                <%= item.name %>
+              </span>
+              <% }) %>
+          </div>
+
+          <div class="mt-5">
+            <% if (hasItems) { %>
+              <form action="/recipes/generate" method="POST">
+                <button type="submit"
+                  class="inline-flex items-center px-6 py-3 text-base font-bold rounded-md text-white bg-emerald-500 hover:bg-emerald-600 transition">
+                  <i class="fas fa-magic mr-2"></i> Generate Recipes
+                </button>
+              </form>
+              <% } else { %>
+                <button disabled class="px-4 py-2 rounded-md text-gray-400 bg-gray-100 cursor-not-allowed">
+                  Add items to get suggestions
+                </button>
+                <% } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recipe Results -->
+      <% if (generated) { %>
+
+        <div class="mb-4">
+          <h2 class="text-xl font-bold text-gray-900">Suggestions</h2>
+          <% if (usedIngredients?.length) { %>
+            <p class="text-sm text-gray-500 mt-1">
+              Based on: <%= usedIngredients.join(', ') %>
+                        </p>
+                        <% } %>
+                </div>
+
+                <% if (suggestions && suggestions.length > 0) { %>
+                    <!-- Container: Horizontal Scroll on Mobile (Carousel), Grid on Desktop (3 cols) -->
+                    <div class="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-8 md:grid md:grid-cols-3 md:gap-8 md:overflow-visible no-scrollbar-mobile p-1"> 
+
+                <% suggestions.forEach(recipe => { %>
+                    <!-- Recipe Card (Vertical Layout: Image Top) -->
+                    <div class="bg-white rounded-xl shadow-lg flex flex-col relative h-full transition-transform hover:-translate-y-1 hover:shadow-2xl overflow-hidden min-w-[85vw] sm:min-w-[45vw] md:min-w-0 snap-center border border-gray-100">
+
+                        <!-- Image (Top) -->
+                        <div class="relative h-56 flex-shrink-0 bg-gray-200">
+                            <img src="<%= recipe.image %>" alt="<%= recipe.name %>" class="w-full h-full object-cover">
+                             <!-- Badge if expiring -->
+                            <% if (recipe.usesExpiring) { %>
+                                <span class="absolute top-3 left-3 z-30 bg-white text-yellow-800 text-xs px-3 py-1.5 rounded-md shadow-md font-bold border border-yellow-300 flex items-center">
+                                    <i class="fas fa-exclamation-circle mr-1.5 text-yellow-600"></i> Uses Expiring
+                                </span>
+                            <% } %>
+                             <!-- Cooking Time Overlay -->
+                             <div class="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded flex items-center">
+                                <i class="fas fa-clock mr-1"></i> <%= recipe.cookingTime %>
+                             </div>
+                        </div>
+
+                        <!-- Content (Bottom) -->
+                        <div class="p-5 flex flex-col flex-1">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-xl font-bold text-gray-900 leading-tight line-clamp-1" title="<%= recipe.name %>">
+                                    <%= recipe.name %>
+                                </h3>
+                                <!-- Favorite Button -->
+                                <form action="/recipes/favorite" method="POST" class="ml-2 flex-shrink-0">
+                                    <input type="hidden" name="recipeId" value="<%= recipe.id %>">
+                                    <input type="hidden" name="recipeName" value="<%= recipe.name %>">
+                                    <input type="hidden" name="recipeImage" value="<%= recipe.image %>">
+                                    <input type="hidden" name="cookingTime" value="<%= recipe.cookingTime %>">
+                                    <input type="hidden" name="instructions" value="<%= recipe.fullInstructions || recipe.instructions %>">
+                                    <button type="submit" class="focus:outline-none transition-transform transform hover:scale-110 active:scale-95">
+                                        <% if (recipe.isFavorite) { %>
+                                            <i class="fas fa-heart text-red-500 text-xl drop-shadow-sm"></i>
+                                        <% } else { %>
+                                            <i class="far fa-heart text-gray-400 hover:text-red-500 text-xl transition-colors"></i>
+                                        <% } %>
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Short Preview (Strictly limited) -->
+                            <p class="text-sm text-gray-600 mb-4 h-11 overflow-hidden leading-relaxed flex-1">
+                                <% 
+                                    const rawInst = recipe.instructions || '';
+                                    // Strip simplified/full labeling if present in text to keep preview clean
+                                    const cleanInst = rawInst.replace(/^Instructions:?\s*/i, '');
+                                    // Strict character limit for preview (~100 chars)
+                                    const shortPreview = cleanInst.length > 90 ? cleanInst.substring(0, 90) + ' ...' :
+                cleanInst; %>
+                <%= shortPreview %>
+            </p>
+
+            <!-- View Recipe Button (Link to specific page) -->
+            <div class="mt-auto pt-2">
+              <a href="/recipes/<%= recipe.id %>"
+                style="background-color: #000 !important; color: #fff !important; display: block;"
+                class="w-full text-center px-4 py-3 border border-transparent text-sm font-bold rounded-lg shadow-md hover:shadow-lg focus:outline-none transition-all uppercase tracking-wider transform active:scale-[0.98]">
+                VIEW FULL RECIPE
+              </a>
+            </div>
+        </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } else { %>
+    <div class="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100 mx-4">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+        <i class="fas fa-utensils text-gray-400 text-2xl"></i>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900">No recipes found</h3>
+      <p class="text-gray-500 mt-1 max-w-sm mx-auto">Try adding more ingredients to your inventory!</p>
+    </div>
+    <% } %>
+      <% } %>
+
+        </div>
+        </div>
+
+        <%- include('../partials/footer') %>
+
+          <style>
+            /* Hide scrollbar for Chrome, Safari and Opera */
+            .no-scrollbar-mobile::-webkit-scrollbar {
+              display: none;
+            }
+
+            /* Hide scrollbar for IE, Edge and Firefox */
+            .no-scrollbar-mobile {
+              -ms-overflow-style: none;
+              /* IE and Edge */
+              scrollbar-width: none;
+              /* Firefox */
+            }
+          </style>

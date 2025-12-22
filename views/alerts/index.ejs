@@ -1,0 +1,116 @@
+<%- include('../partials/header') %>
+
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="px-4 sm:px-0 mb-6 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Alerts</h1>
+                <p class="mt-1 text-sm text-gray-500">Stay on top of your inventory.</p>
+            </div>
+            <% if (alerts && alerts.length> 0) { %>
+                <form action="/alerts/mark-all-read" method="POST">
+                    <button type="submit" class="text-sm text-emerald-600 hover:text-emerald-500 font-medium">
+                        Mark all as read
+                    </button>
+                </form>
+                <% } %>
+        </div>
+
+        <!-- Alert List -->
+        <div class="bg-white shadow overflow-hidden sm:rounded-md">
+            <% if (alerts.length===0) { %>
+                <div class="text-center py-12">
+                    <i class="fas fa-bell-slash text-gray-300 text-4xl mb-4"></i>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No alerts</h3>
+                    <p class="mt-1 text-sm text-gray-500">You're all caught up!</p>
+                </div>
+                <% } else { %>
+                    <ul role="list" class="divide-y divide-gray-200">
+                        <% let todayHeaderShown=false; let earlierHeaderShown=false; const today=new
+                            Date().toDateString(); %>
+
+                            <% alerts.forEach(alert=> {
+                                const alertDate = new Date(alert.createdAt).toDateString();
+                                const isToday = alertDate === today;
+
+                                if (isToday && !todayHeaderShown) { %>
+                                <li
+                                    class="bg-gray-50 px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Today
+                                </li>
+                                <% todayHeaderShown=true; } else if (!isToday && !earlierHeaderShown) { %>
+                                    <li
+                                        class="bg-gray-50 px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Earlier
+                                    </li>
+                                    <% earlierHeaderShown=true; } %>
+                                        <li
+                                            class="<%= alert.read ? 'opacity-75' : 'bg-white' %> hover:bg-gray-50 transition duration-150 ease-in-out">
+                                            <div class="px-4 py-4 sm:px-6 flex items-start">
+                                                <!-- Icon based on Priority/Type -->
+                                                <div class="flex-shrink-0 mr-4">
+                                                    <% if (alert.priority==='danger' || alert.type==='EXPIRED' ) { %>
+                                                        <div
+                                                            class="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center">
+                                                            <i
+                                                                class="fas fa-exclamation-triangle text-red-600 text-sm"></i>
+                                                        </div>
+                                                        <% } else if (alert.priority==='warning' ||
+                                                            alert.type==='EXPIRING_SOON' ) { %>
+                                                            <div
+                                                                class="h-8 w-8 rounded-full bg-yellow-100 flex items-center justify-center">
+                                                                <i
+                                                                    class="fas fa-hourglass-half text-yellow-600 text-sm"></i>
+                                                            </div>
+                                                            <% } else { %>
+                                                                <div
+                                                                    class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                                                    <i class="fas fa-info text-blue-600 text-sm"></i>
+                                                                </div>
+                                                                <% } %>
+                                                </div>
+
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="flex justify-between">
+                                                        <p class="text-sm font-medium text-gray-900 truncate">
+                                                            <%= alert.message %>
+                                                        </p>
+                                                        <div class="ml-2 flex-shrink-0 flex">
+                                                            <p class="text-xs text-gray-500">
+                                                                <%= new Date(alert.createdAt).toLocaleTimeString([],
+                                                                    {hour: '2-digit' , minute:'2-digit'}) %>
+                                                                    <% if (!isToday) { %>
+                                                                        <span class="hidden sm:inline"> - <%= new
+                                                                                Date(alert.createdAt).toLocaleDateString()
+                                                                                %></span>
+                                                                        <% } %>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mt-1 flex justify-between items-center">
+                                                        <p class="text-sm text-gray-500">
+                                                            <% if (alert.item) { %>
+                                                                Item: <span class="font-medium">
+                                                                    <%= alert.item.name %>
+                                                                </span>
+                                                                <% } %>
+                                                        </p>
+                                                        <% if (!alert.read) { %>
+                                                            <form action="/alerts/<%= alert._id %>/read" method="POST"
+                                                                class="ml-4">
+                                                                <button type="submit"
+                                                                    class="text-xs text-emerald-600 hover:text-emerald-500 font-medium">
+                                                                    Mark as read
+                                                                </button>
+                                                            </form>
+                                                            <% } %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <% }); %>
+                    </ul>
+                    <% } %>
+        </div>
+    </div>
+
+    <%- include('../partials/footer') %>

@@ -1,0 +1,69 @@
+<%- include('../partials/header') %>
+
+    <div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <!-- Responsive Centered Small Card -->
+        <div
+            class="bg-white rounded-3xl shadow-xl overflow-hidden w-full max-w-md flex flex-col relative border border-gray-100">
+
+            <!-- Navbar / Back -->
+            <div class="absolute top-4 left-4 z-10">
+                <a href="/recipes"
+                    class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-colors">
+                    <i class="fas fa-arrow-left text-sm"></i>
+                </a>
+            </div>
+
+            <!-- Image (Centered, Not Full Width) -->
+            <div class="pt-10 px-8 flex justify-center bg-white">
+                <div
+                    class="relative w-48 h-48 sm:w-56 sm:h-56 shadow-lg rounded-full border-4 border-gray-50 overflow-hidden shrink-0">
+                    <img src="<%= recipe.image %>" alt="<%= recipe.name %>" class="w-full h-full object-cover">
+                </div>
+            </div>
+
+            <!-- Header Info -->
+            <div class="px-6 pt-6 pb-2 text-center bg-white">
+                <h1 class="text-2xl font-extrabold text-gray-900 leading-tight mb-2">
+                    <%= recipe.name %>
+                </h1>
+
+                <div class="flex items-center justify-center space-x-4 mb-4">
+                    <span
+                        class="inline-flex items-center text-sm font-semibold text-gray-500 bg-gray-50 px-3 py-1 rounded-full">
+                        <i class="fas fa-clock mr-2 text-gray-400"></i>
+                        <%= recipe.cookingTime %>
+                    </span>
+
+                    <form action="/recipes/favorite" method="POST" class="inline-block">
+                        <input type="hidden" name="recipeId" value="<%= recipe.id %>">
+                        <input type="hidden" name="recipeName" value="<%= recipe.name %>">
+                        <input type="hidden" name="recipeImage" value="<%= recipe.image %>">
+                        <input type="hidden" name="cookingTime" value="<%= recipe.cookingTime %>">
+                        <input type="hidden" name="instructions" value="<%= recipe.instructions %>">
+
+                        <button type="submit"
+                            class="inline-flex items-center text-sm font-semibold text-gray-400 hover:text-red-500 transition-colors focus:outline-none">
+                            <% if (recipe.isFavorite) { %>
+                                <i class="fas fa-heart text-red-500 text-xl"></i>
+                                <% } else { %>
+                                    <i class="far fa-heart text-xl"></i>
+                                    <% } %>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Scrollable Instructions -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar px-8 pb-8 bg-white border-t border-gray-50">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-6 mb-3 text-center">Instructions
+                </h3>
+                <div class="prose prose-sm max-w-none">
+                    <div class="text-black text-base leading-relaxed whitespace-pre-line font-normal text-left">
+                        <%= recipe.instructions %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/footer') %>

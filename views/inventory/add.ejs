@@ -1,0 +1,56 @@
+<%- include('../partials/header') %>
+
+    <div class="max-w-3xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
+            <div class="md:grid md:grid-cols-3 md:gap-6">
+                <div class="md:col-span-1">
+                    <h3 class="text-lg font-medium leading-6 text-gray-900">Add New Item</h3>
+                    <p class="mt-1 text-sm text-gray-500">
+                        Enter the details of your food item. We'll stick labels on it for you.
+                    </p>
+                </div>
+                <div class="mt-5 md:mt-0 md:col-span-2">
+                    <form action="/inventory/add" method="POST">
+                        <div class="grid grid-cols-6 gap-6">
+                            <div class="col-span-6 sm:col-span-4">
+                                <label for="name" class="block text-sm font-medium text-gray-700">Item Name</label>
+                                <input type="text" name="name" id="name" required
+                                    class="mt-1 focus:ring-emerald-500 focus:border-emerald-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                    placeholder="e.g. Milk">
+                            </div>
+
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
+                                <input type="text" name="quantity" id="quantity" required
+                                    class="mt-1 focus:ring-emerald-500 focus:border-emerald-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                    placeholder="e.g. 1L, 2 cartons">
+                            </div>
+
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="shelfLife" class="block text-sm font-medium text-gray-700">Shelf Life
+                                    (Days)</label>
+                                <input type="number" name="shelfLife" id="shelfLife" required min="1"
+                                    class="mt-1 focus:ring-emerald-500 focus:border-emerald-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                            </div>
+
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="daysOld" class="block text-sm font-medium text-gray-700">How old is it?
+                                    (Days)</label>
+                                <input type="number" name="daysOld" id="daysOld" required min="0" value="0"
+                                    class="mt-1 focus:ring-emerald-500 focus:border-emerald-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                <p class="mt-2 text-sm text-gray-500">0 means bought today.</p>
+                            </div>
+                        </div>
+                        <div class="px-4 py-3 bg-gray-50 text-right sm:px-6 mt-5 -mx-6 -mb-6 rounded-b-lg">
+                            <button type="submit"
+                                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                                Add Item
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/footer') %>

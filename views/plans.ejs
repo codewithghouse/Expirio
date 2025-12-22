@@ -1,0 +1,114 @@
+<%- include('partials/header') %>
+
+    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div class="sm:flex sm:flex-col sm:align-center">
+            <h1 class="text-3xl font-extrabold text-gray-900 sm:text-center">Pricing Plans</h1>
+            <p class="mt-5 text-xl text-gray-500 sm:text-center">Start managing your food inventory today.</p>
+        </div>
+
+        <div
+            class="mt-12 space-y-4 sm:mt-16 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-6 lg:max-w-4xl lg:mx-auto xl:max-w-none xl:mx-0 xl:grid-cols-4">
+            <% plans.forEach(plan=> { %>
+                <% const isCurrent=currentPlanName===plan.name; %>
+                    <div
+                        class="border border-gray-200 rounded-lg shadow-sm divide-y divide-gray-200 bg-white flex flex-col <%= isCurrent ? 'ring-2 ring-emerald-500' : '' %>">
+                        <div class="p-6 flex-1">
+                            <h2 class="text-lg leading-6 font-medium text-gray-900 capitalize">
+                                <%= plan.name %>
+                            </h2>
+                            <p class="mt-4">
+                                <span class="text-4xl font-extrabold text-gray-900">£<%= plan.price %></span>
+                                <% if (!plan.isLifetime) { %>
+                                    <span class="text-base font-medium text-gray-500">/<%= plan.durationInDays===7
+                                            ? 'wk' : plan.durationInDays===30 ? 'mo' : 'period' %></span>
+                                    <% } else { %>
+                                        <span class="text-base font-medium text-gray-500">/once</span>
+                                        <% } %>
+                            </p>
+                            <p class="mt-4 text-sm text-gray-500">
+                                <%= plan.description %>
+                            </p>
+
+                            <!-- Feature List -->
+                            <ul role="list" class="mt-6 space-y-4">
+                                <% const features=planFeatures[plan.name] || {}; %>
+
+                                    <li class="flex space-x-3">
+                                        <% if (features.maxItems===Infinity) { %>
+                                            <i class="fas fa-check text-emerald-500 flex-shrink-0 h-5 w-5"
+                                                aria-hidden="true"></i>
+                                            <span class="text-sm text-gray-500">Unlimited Items</span>
+                                            <% } else { %>
+                                                <i class="fas fa-check text-emerald-500 flex-shrink-0 h-5 w-5"
+                                                    aria-hidden="true"></i>
+                                                <span class="text-sm text-gray-500">Up to <%= features.maxItems %>
+                                                        Items</span>
+                                                <% } %>
+                                    </li>
+
+                                    <li class="flex space-x-3">
+                                        <% if (features.automationEnabled) { %>
+                                            <i class="fas fa-check text-emerald-500 flex-shrink-0 h-5 w-5"
+                                                aria-hidden="true"></i>
+                                            <span class="text-sm text-gray-500">Smart Automation</span>
+                                            <% } else { %>
+                                                <i class="fas fa-times text-gray-300 flex-shrink-0 h-5 w-5"
+                                                    aria-hidden="true"></i>
+                                                <span class="text-sm text-gray-500 line-through">Smart Automation</span>
+                                                <% } %>
+                                    </li>
+
+                                    <li class="flex space-x-3">
+                                        <% if (features.barcodeScanner) { %>
+                                            <i class="fas fa-check text-emerald-500 flex-shrink-0 h-5 w-5"
+                                                aria-hidden="true"></i>
+                                            <span class="text-sm text-gray-500">Barcode Scanner</span>
+                                            <% } else { %>
+                                                <i class="fas fa-times text-gray-300 flex-shrink-0 h-5 w-5"
+                                                    aria-hidden="true"></i>
+                                                <span class="text-sm text-gray-500 line-through">Barcode Scanner</span>
+                                                <% } %>
+                                    </li>
+
+                                    <li class="flex space-x-3">
+                                        <% if (features.priorityAlerts) { %>
+                                            <i class="fas fa-check text-emerald-500 flex-shrink-0 h-5 w-5"
+                                                aria-hidden="true"></i>
+                                            <span class="text-sm text-gray-500">Priority Alerts</span>
+                                            <% } else { %>
+                                                <i class="fas fa-times text-gray-300 flex-shrink-0 h-5 w-5"
+                                                    aria-hidden="true"></i>
+                                                <span class="text-sm text-gray-500 line-through">Priority Alerts</span>
+                                                <% } %>
+                                    </li>
+                            </ul>
+
+                            <% if (plan.name==='trial' ) { %>
+                                <p class="mt-6 text-sm text-gray-500 italic">Perfect for testing the waters.</p>
+                                <% } else if (plan.name==='lifetime' ) { %>
+                                    <p class="mt-6 text-sm text-emerald-600 font-semibold">Best Value!</p>
+                                    <% } %>
+                        </div>
+
+                        <div class="pt-6 pb-8 px-6">
+                            <% if (isCurrent) { %>
+                                <button disabled
+                                    class="w-full bg-emerald-100 text-emerald-700 border border-transparent rounded-md py-2 text-sm font-semibold cursor-default">
+                                    Current Plan
+                                </button>
+                                <% } else { %>
+                                    <form action="/plans/select" method="POST">
+                                        <input type="hidden" name="planId" value="<%= plan._id %>">
+                                        <button type="submit"
+                                            class="w-full bg-gray-800 border border-transparent rounded-md py-2 text-sm font-semibold text-white hover:bg-gray-900 transition-colors">
+                                            Choose <%= plan.name.charAt(0).toUpperCase() + plan.name.slice(1) %>
+                                        </button>
+                                    </form>
+                                    <% } %>
+                        </div>
+                    </div>
+                    <% }); %>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
