@@ -14,7 +14,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Database Connection
-mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/expiriomvp')
+mongoose.connect(process.env.MONGODB_URI)
     .then(async () => {
         console.log('MongoDB Connected');
         await seedPlans(); // Run seedPlans on startup
@@ -36,7 +36,7 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'expirio_secret_key',
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/expirio' }),
+    store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 } // 1 day
 }));
 
