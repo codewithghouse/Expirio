@@ -1,13 +1,12 @@
 <%- include('../partials/header') %>
 
-    <!-- STRICT Mobile-First App Header (Mobile Only) -->
+    <!-- Mobile Sticky "Pill" Header -->
     <div class="sticky top-0 z-40 bg-gray-50/95 backdrop-blur-sm pt-4 pb-4 px-4 md:hidden transition-all duration-300"
         id="sticky-header">
         <div class="max-w-md mx-auto">
             <!-- Main Pill Container -->
             <div
                 class="bg-white rounded-full shadow-sm border border-gray-200 h-12 flex items-center justify-between px-1 relative overflow-hidden">
-
                 <!-- Left: Category / Home -->
                 <button onclick="openCategorySheet()"
                     class="flex items-center space-x-2 pl-3 pr-4 py-2 rounded-full hover:bg-gray-50 active:bg-gray-100 transition-colors h-full flex-1 min-w-0"
@@ -28,20 +27,9 @@
                         <i class="fas fa-search text-lg"></i>
                     </button>
 
-                    <!-- Divider -->
-                    <div class="h-6 w-px bg-gray-200 mx-1"></div>
-
-                    <!-- Filter Trigger -->
-                    <button onclick="openFilterSheet()"
-                        class="p-2.5 rounded-full text-gray-500 hover:text-emerald-600 hover:bg-gray-50 active:bg-gray-100 transition-all relative">
-                        <i class="fas fa-sliders-h text-lg"></i>
-                        <!-- Dot -->
-                        <span id="filter-active-indicator"
-                            class="hidden absolute top-2 right-2 h-2 w-2 rounded-full bg-emerald-500 ring-1 ring-white"></span>
-                    </button>
                 </div>
 
-                <!-- Search Overlay (Absolute inside pill) -->
+                <!-- Search Overlay -->
                 <div id="search-overlay"
                     class="absolute inset-0 bg-white z-10 flex items-center px-2 transform translate-x-full transition-transform duration-300">
                     <div class="flex-1 relative">
@@ -58,8 +46,7 @@
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 pt-2">
-
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-32 pt-2">
         <% if (items.length===0) { %>
             <div class="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-100 mt-4">
                 <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gray-100 mb-4">
@@ -68,6 +55,7 @@
                 <h3 class="mt-2 text-base font-medium text-gray-900">No items found</h3>
                 <p class="mt-1 text-sm text-gray-500">Get started by adding some food items.</p>
                 <div class="mt-6">
+                    <!-- Triggers Batch Modal -->
                     <button onclick="openModal()"
                         class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-full text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
                         <i class="fas fa-plus mr-2"></i> Add Item
@@ -77,80 +65,74 @@
             <% } else { %>
                 <!-- Item Grid -->
                 <div id="inventory-grid" class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    <% items.forEach(item=> { %>
-                        <% const today=new Date(); const expiry=new Date(item.expiryDate); const
-                            diffTime=expiry.getTime() - today.getTime(); const diffDays=Math.ceil(diffTime / (1000 * 60
-                            * 60 * 24)); let expiryText="" ; let expiryColor="text-gray-500" ; let statusSortValue=0; //
-                            For sorting logic if (diffDays> 0) {
-                            expiryText = `Expires in ${diffDays} day${diffDays !== 1 ? 's' : ''}`;
-                            if (diffDays <= 3) { expiryColor="text-amber-600" ; statusSortValue=2; // Expiring soon }
-                                else { expiryColor="text-emerald-600" ; statusSortValue=3; // Fresh } } else if
-                                (diffDays===0) { expiryText="Expires today" ; expiryColor="text-orange-600" ;
-                                statusSortValue=1; // Very urgent } else { expiryText=`Expired ${Math.abs(diffDays)}
-                                day${Math.abs(diffDays) !==1 ? 's' : '' } ago`; expiryColor="text-red-600" ;
-                                statusSortValue=0; // Expired } %>
-                                <!-- Item Card with Data Attributes for Filtering -->
-                                <div class="inventory-item group bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100 relative transition-all hover:shadow-md"
-                                    data-name="<%= item.name.toLowerCase() %>" data-id="<%= item._id %>"
-                                    data-status-val="<%= statusSortValue %>" data-expiry-days="<%= diffDays %>"
-                                    data-created="<%= new Date(item.createdAt).getTime() %>" data-category="unknown">
-                                    <!-- Category assigned via JS -->
+                    <% items.forEach(item=> {
+                        const today = new Date();
+                        const expiry = new Date(item.expiryDate);
+                        const diffTime = expiry.getTime() - today.getTime();
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        let expiryText = "";
+                        let expiryColor = "text-gray-500";
+                        let statusSortValue = 0;
 
-                                    <div class="p-4 flex items-center">
-                                        <!-- Icon Box -->
-                                        <div
-                                            class="flex-shrink-0 h-12 w-12 rounded-2xl bg-gray-50 flex items-center justify-center text-2xl shadow-inner mr-4 item-icon-container">
-                                            <!-- Icon injected by JS helper or default -->
-                                            <span class="item-icon">📦</span>
+                        if (diffDays > 0) {
+                        expiryText = `Expires in ${diffDays} day${diffDays !== 1 ? 's' : ''}`;
+                        if (diffDays <= 3) { expiryColor="text-amber-600" ; statusSortValue=2; } else {
+                            expiryColor="text-emerald-600" ; statusSortValue=3; } } else if (diffDays===0) {
+                            expiryText="Expires today" ; expiryColor="text-orange-600" ; statusSortValue=1; } else {
+                            expiryText=`Expired ${Math.abs(diffDays)} day${Math.abs(diffDays) !==1 ? 's' : '' } ago`;
+                            expiryColor="text-red-600" ; statusSortValue=0; } %>
+                            <div class="inventory-item group bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100 relative transition-all hover:shadow-md"
+                                data-name="<%= item.name.toLowerCase() %>" data-id="<%= item._id %>"
+                                data-status-val="<%= statusSortValue %>" data-expiry-days="<%= diffDays %>"
+                                data-created="<%= new Date(item.createdAt).getTime() %>" data-category="unknown">
+
+                                <div class="p-4 flex items-center">
+                                    <div
+                                        class="flex-shrink-0 h-12 w-12 rounded-2xl bg-gray-50 flex items-center justify-center text-2xl shadow-inner mr-4 item-icon-container">
+                                        <span class="item-icon">📦</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex justify-between items-start">
+                                            <h3
+                                                class="text-base font-semibold text-gray-900 truncate item-name capitalize">
+                                                <%= item.name %>
+                                            </h3>
+                                            <form action="/inventory/<%= item._id %>?_method=DELETE" method="POST"
+                                                onsubmit="return confirm('Remove this item?');"
+                                                class="ml-2 opacity-0 group-hover:opacity-100 transition-opacity focus-within:opacity-100">
+                                                <button type="submit"
+                                                    class="text-gray-300 hover:text-red-500 p-1 rounded-full hover:bg-red-50 focus:outline-none">
+                                                    <i class="fas fa-trash-alt text-sm"></i>
+                                                </button>
+                                            </form>
                                         </div>
-
-                                        <!-- Content -->
-                                        <div class="flex-1 min-w-0">
-                                            <div class="flex justify-between items-start">
-                                                <h3
-                                                    class="text-base font-semibold text-gray-900 truncate item-name capitalize">
-                                                    <%= item.name %>
-                                                </h3>
-                                                <!-- Quick Action: Delete -->
-                                                <form action="/inventory/<%= item._id %>?_method=DELETE" method="POST"
-                                                    onsubmit="return confirm('Remove this item?');"
-                                                    class="ml-2 opacity-0 group-hover:opacity-100 transition-opacity focus-within:opacity-100">
-                                                    <button type="submit"
-                                                        class="text-gray-300 hover:text-red-500 p-1 rounded-full hover:bg-red-50 focus:outline-none">
-                                                        <i class="fas fa-trash-alt text-sm"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-
-                                            <div class="flex items-center mt-1">
-                                                <span
-                                                    class="text-xs font-medium bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md mr-2">
-                                                    x<%= item.quantity %>
-                                                </span>
-                                                <p class="text-xs font-medium <%= expiryColor %> flex items-center">
-                                                    <i class="far fa-clock mr-1 text-[10px]"></i>
-                                                    <%= expiryText %>
-                                                </p>
-                                            </div>
+                                        <div class="flex items-center mt-1">
+                                            <span
+                                                class="text-xs font-medium bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md mr-2">x
+                                                <%= item.quantity %>
+                                            </span>
+                                            <p class="text-xs font-medium <%= expiryColor %> flex items-center">
+                                                <i class="far fa-clock mr-1 text-[10px]"></i>
+                                                <%= expiryText %>
+                                            </p>
                                         </div>
                                     </div>
-
-                                    <!-- Progress Bar for Freshness -->
-                                    <% // Simple progress calculation let percentage=100; if (item.status !=='expired' )
-                                        { const totalLife=item.shelfLife || 7; const daysLeft=diffDays < 0 ? 0 :
-                                        diffDays; percentage=Math.max(0, Math.min(100, (daysLeft / totalLife) * 100)); }
-                                        else { percentage=0; } let progressColor='bg-emerald-500' ; if(percentage < 50)
-                                        progressColor='bg-yellow-500' ; if(percentage < 20) progressColor='bg-red-500' ;
-                                        %>
-                                        <div class="absolute bottom-0 left-0 w-full h-1 bg-gray-50">
-                                            <div class="h-full <%= progressColor %> transition-all duration-500"
-                                                style="width: <%= percentage %>%"></div>
-                                        </div>
                                 </div>
-                                <% }); %>
+
+                                <!-- Progress Bar -->
+                                <% let percentage=100; if (item.status !=='expired' ) { const totalLife=item.shelfLife
+                                    || 7; const daysLeft=diffDays < 0 ? 0 : diffDays; percentage=Math.max(0,
+                                    Math.min(100, (daysLeft / totalLife) * 100)); } else { percentage=0; } let
+                                    progressColor='bg-emerald-500' ; if (percentage < 50) progressColor='bg-yellow-500'
+                                    ; if (percentage < 20) progressColor='bg-red-500' ; %>
+                                    <div class="absolute bottom-0 left-0 w-full h-1 bg-gray-50">
+                                        <div class="h-full <%= progressColor %> transition-all duration-500"
+                                            style="width: <%= percentage %>%"></div>
+                                    </div>
+                            </div>
+                            <% }); %>
                 </div>
 
-                <!-- Empty State for Filters -->
                 <div id="no-results" class="hidden text-center py-10">
                     <i class="fas fa-search text-gray-300 text-4xl mb-3"></i>
                     <p class="text-gray-500">No items match your search.</p>
@@ -158,13 +140,115 @@
                 <% } %>
     </div>
 
-    <!-- Floating Action Button -->
+    <!-- Floating Filter Button (Bottom) -->
+    <button onclick="openFilterSheet()"
+        class="fixed bottom-[72px] right-4 bg-white text-gray-700 hover:text-emerald-600 rounded-full p-4 shadow-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all z-40 flex items-center justify-center md:hidden relative">
+        <i class="fas fa-sliders-h text-xl"></i>
+        <span id="filter-active-indicator"
+            class="hidden absolute top-3 right-3 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+    </button>
+
+    <!-- Floating Action Button (Add Item) - Stacked Above Filter -->
     <button onclick="openModal()"
-        class="fixed bottom-6 right-6 bg-gray-900 hover:scale-105 hover:bg-black text-white rounded-2xl p-4 shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-all z-40 flex items-center justify-center">
+        class="fixed bottom-[136px] right-4 bg-gray-900 hover:scale-105 hover:bg-black text-white rounded-2xl p-4 shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-all z-40 flex items-center justify-center md:hidden">
         <i class="fas fa-plus text-xl"></i>
     </button>
 
-    <!-- Sort & Filter Bottom Sheet -->
+    <!-- Batch Add Modal -->
+    <div id="batchAddModal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
+        <div
+            class="absolute bottom-0 inset-x-0 h-[85vh] bg-white rounded-t-[2rem] shadow-2xl flex flex-col overflow-hidden animate-fade-in-up">
+            <!-- Handle -->
+            <div class="w-full flex justify-center pt-3 pb-2 flex-shrink-0" onclick="closeModal()">
+                <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+            </div>
+            <!-- Header -->
+            <div class="px-6 pb-4 flex justify-between items-center flex-shrink-0 border-b border-gray-100">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900">Add Items</h2>
+                    <p class="text-sm text-gray-500" id="pending-count-label">0 items pending</p>
+                </div>
+                <button onclick="closeModal()" class="p-2 bg-gray-100 rounded-full text-gray-600 hover:bg-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <!-- Content -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-8 no-scrollbar">
+                <!-- Pending List -->
+                <div id="pending-section" class="hidden">
+                    <h3 class="text-sm font-semibold text-gray-900 mb-3 flex items-center">
+                        <i class="fas fa-shopping-basket text-emerald-500 mr-2"></i> Pending to Add
+                    </h3>
+                    <div id="pending-list" class="space-y-3"></div>
+                </div>
+                <!-- Suggestions -->
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900 mb-3">Quick Suggestions</h3>
+                    <div class="grid grid-cols-4 gap-3">
+                        <% suggestions.forEach(s=> { %>
+                            <button onclick="addToBatch('<%= s.name %>', <%= s.shelf %>)"
+                                class="flex flex-col items-center justify-center p-2 rounded-xl bg-gray-50 border border-gray-100 active:scale-95 active:bg-emerald-50 active:border-emerald-200 transition-all">
+                                <span class="text-2xl mb-1">
+                                    <%= s.icon %>
+                                </span>
+                                <span class="text-[10px] font-medium text-gray-600 truncate w-full text-center">
+                                    <%= s.name %>
+                                </span>
+                                <div
+                                    class="mt-1 w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-sm">
+                                    <i class="fas fa-plus text-[10px] text-emerald-600"></i>
+                                </div>
+                            </button>
+                            <% }) %>
+                    </div>
+                </div>
+                <!-- Manual/Scan -->
+                <div class="p-4 rounded-2xl bg-gray-50 border border-dashed border-gray-300 text-center">
+                    <p class="text-xs text-gray-500 mb-3">Can't find it?</p>
+                    <div class="flex space-x-3 justify-center">
+                        <button onclick="alert('Scanner requires HTTPS')"
+                            class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium shadow-sm flex items-center">
+                            <i class="fas fa-barcode mr-2 text-gray-400"></i> Scan
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Footer -->
+            <div class="p-6 border-t border-gray-100 bg-white pb-8 flex-shrink-0">
+                <button onclick="submitBatch()" id="btn-add-all" disabled
+                    class="w-full py-4 rounded-2xl bg-gray-900 text-white font-bold text-lg shadow-lg shadow-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all active:scale-[0.98]">
+                    <span>Add All Items</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Sheet -->
+    <div id="category-sheet-overlay"
+        class="fixed inset-0 bg-black bg-opacity-40 z-50 hidden transition-opacity backdrop-blur-sm"
+        onclick="closeCategorySheet()"></div>
+    <div id="category-sheet"
+        class="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl z-50 transform translate-y-full transition-transform duration-300 ease-out max-h-[70vh] overflow-y-auto">
+        <div class="p-2 flex justify-center">
+            <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+        </div>
+        <div class="px-6 pb-8 pt-2">
+            <h3 class="text-lg font-bold text-gray-900 mb-6">Select Category</h3>
+            <div class="grid grid-cols-3 gap-3" id="category-sheet-grid">
+                <button onclick="filterByCategory('all')"
+                    class="flex flex-col items-center justify-center p-4 rounded-2xl bg-gray-50 hover:bg-emerald-50 border border-transparent hover:border-emerald-200 transition-all">
+                    <div
+                        class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-xl mb-2">
+                        🏠</div>
+                    <span class="text-xs font-medium text-gray-700">All Food</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Sheet -->
     <div id="filter-sheet-overlay"
         class="fixed inset-0 bg-black bg-opacity-40 z-50 hidden transition-opacity backdrop-blur-sm"
         onclick="closeFilterSheet()"></div>
@@ -176,13 +260,10 @@
         <div class="px-6 pb-8 pt-2">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-lg font-bold text-gray-900">Sort & Filter</h3>
-                <button onclick="closeFilterSheet()" class="text-gray-400 hover:text-gray-600">
-                    <i class="fas fa-times text-lg"></i>
-                </button>
+                <button onclick="closeFilterSheet()" class="text-gray-400 hover:text-gray-600"><i
+                        class="fas fa-times text-lg"></i></button>
             </div>
-
             <div class="space-y-6">
-                <!-- Sort Options -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-3">Sort By</label>
                     <div class="grid grid-cols-2 gap-3">
@@ -204,352 +285,26 @@
                         </button>
                     </div>
                 </div>
-
                 <div class="border-t border-gray-100"></div>
-
-                <!-- Additional Filters can go here -->
                 <div class="flex justify-between items-center">
                     <button onclick="resetFilters()" class="text-sm text-gray-500 hover:text-gray-900 font-medium">Reset
                         All</button>
                     <button onclick="closeFilterSheet()"
-                        class="bg-gray-900 text-white px-8 py-3 rounded-xl text-sm font-bold shadow-lg shadow-gray-200 active:scale-95 transition-transform">
-                        View Results
-                    </button>
+                        class="bg-gray-900 text-white px-8 py-3 rounded-xl text-sm font-bold shadow-lg shadow-gray-200 active:scale-95 transition-transform">View
+                        Results</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Category Bottom Sheet -->
-    <div id="category-sheet-overlay"
-        class="fixed inset-0 bg-black bg-opacity-40 z-50 hidden transition-opacity backdrop-blur-sm"
-        onclick="closeCategorySheet()"></div>
-    <div id="category-sheet"
-        class="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl z-50 transform translate-y-full transition-transform duration-300 ease-out max-h-[70vh] overflow-y-auto">
-        <div class="p-2 flex justify-center">
-            <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
-        </div>
-        <div class="px-6 pb-8 pt-2">
-            <h3 class="text-lg font-bold text-gray-900 mb-6">Select Category</h3>
-            <div class="grid grid-cols-3 gap-3" id="category-sheet-grid">
-                <!-- Injected via JS -->
-                <button onclick="filterByCategory('all')"
-                    class="flex flex-col items-center justify-center p-4 rounded-2xl bg-gray-50 hover:bg-emerald-50 border border-transparent hover:border-emerald-200 transition-all">
-                    <div
-                        class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-xl mb-2">
-                        🏠</div>
-                    <span class="text-xs font-medium text-gray-700">All Food</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Item Modal (Existing) -->
-    <div id="addItemModal" class="fixed z-50 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog"
-        aria-modal="true">
-        <!-- ... existing modal ... -->
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" aria-hidden="true"
-                onclick="closeModal()"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div
-                class="inline-block align-bottom bg-white rounded-2xl px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6 w-full animate-fade-in-up">
-                <form action="/inventory/add" method="POST">
-                    <div>
-                        <div
-                            class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-emerald-100 mb-4">
-                            <i class="fas fa-plus text-emerald-600 text-xl"></i>
-                        </div>
-                        <div class="text-center">
-                            <h3 class="text-lg leading-6 font-bold text-gray-900" id="modal-title">Quick Add Item</h3>
-                            <p class="mt-1 text-sm text-gray-500">Add to your inventory in seconds.</p>
-                        </div>
-
-                        <div class="mt-6 space-y-5">
-                            <input type="hidden" name="shelfLife" value="7">
-                            <div>
-                                <label for="name" class="block text-sm font-medium text-gray-700">Item Name</label>
-                                <input type="text" name="name" id="name" required
-                                    class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm py-3 px-4 bg-gray-50"
-                                    placeholder="e.g. Eggs">
-                            </div>
-                            <div>
-                                <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
-                                <div class="flex items-center mt-1">
-                                    <button type="button" onclick="adjustQuantity(-1)"
-                                        class="w-12 h-12 flex items-center justify-center border border-gray-300 rounded-l-xl bg-white hover:bg-gray-50 text-gray-600 focus:ring-2 focus:ring-emerald-500 transition-colors">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                    <input type="number" name="quantity" id="quantity" value="1" min="1" readonly
-                                        class="block w-full h-12 text-center border-t border-b border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 sm:text-lg font-semibold appearance-none bg-gray-50">
-                                    <button type="button" onclick="adjustQuantity(1)"
-                                        class="w-12 h-12 flex items-center justify-center border border-gray-300 rounded-r-xl bg-white hover:bg-gray-50 text-gray-600 focus:ring-2 focus:ring-emerald-500 transition-colors">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div>
-                                <label for="daysOld" class="block text-sm font-medium text-gray-700">Days since
-                                    purchase?</label>
-                                <div class="mt-1 relative rounded-md shadow-sm">
-                                    <input type="number" name="daysOld" id="daysOld" required min="0" value="0"
-                                        class="focus:ring-emerald-500 focus:border-emerald-500 block w-full pl-4 pr-12 sm:text-sm border-gray-300 rounded-xl py-3 bg-gray-50">
-                                    <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                                        <span class="text-gray-500 sm:text-sm">days</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-8 grid grid-cols-2 gap-4">
-                        <button type="button" onclick="closeModal()"
-                            class="w-full inline-flex justify-center rounded-xl border border-gray-300 shadow-sm px-4 py-3 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 sm:text-sm">
-                            Cancel
-                        </button>
-                        <button type="submit"
-                            class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-4 py-3 bg-emerald-600 text-base font-bold text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 sm:text-sm">
-                            Add Item
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // --- Category Helper ---
-        const categoryKeywords = {
-            'Dairy': ['milk', 'cheese', 'butter', 'yogurt', 'cream', 'egg', 'margarine'],
-            'Produce': ['apple', 'banana', 'orange', 'fruit', 'veg', 'potato', 'onion', 'carrot', 'tomato', 'lettuce', 'spinach', 'broccoli', 'avocado', 'cucumber', 'garlic', 'lemon', 'lime', 'grape'],
-            'Meat': ['chicken', 'beef', 'steak', 'pork', 'fish', 'salmon', 'tuna', 'meat', 'ham', 'bacon'],
-            'Bakery': ['bread', 'bagel', 'bun', 'toast', 'croissant', 'cake', 'muffin', 'tortilla'],
-            'Pantry': ['rice', 'pasta', 'cereal', 'oat', 'sugar', 'flour', 'oil', 'salt', 'pepper', 'spice', 'sauce', 'honey', 'jam', 'peanut', 'chocolate', 'snack', 'chip'],
-            'Beverages': ['juice', 'soda', 'water', 'beer', 'wine', 'coffee', 'tea', 'drink']
-        };
-
-        const iconMap = {
-            'Dairy': '🧀',
-            'Produce': '🥬',
-            'Meat': '🥩',
-            'Bakery': '🍞',
-            'Pantry': '🥫',
-            'Beverages': '🧃',
-            'Others': '📦',
-            'all': '🏠'
-        };
-
-        function getCategory(name) {
-            name = name.toLowerCase();
-            for (const [cat, keywords] of Object.entries(categoryKeywords)) {
-                if (keywords.some(k => name.includes(k))) return cat;
-            }
-            return 'Others';
-        }
-
-        // --- Init Client Logic ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const items = document.querySelectorAll('.inventory-item');
-            const validCategories = new Set();
-
-            // 1. Assign Categories & Icons
-            items.forEach(item => {
-                const name = item.getAttribute('data-name');
-                const category = getCategory(name);
-                item.setAttribute('data-category', category);
-
-                // Set Icon
-                const iconContainer = item.querySelector('.item-icon');
-                if (iconContainer) iconContainer.textContent = iconMap[category] || '📦';
-
-                validCategories.add(category);
-            });
-
-            // 2. Render Category Sheet Grid
-            const sheetGrid = document.getElementById('category-sheet-grid');
-            // Keep 'All' button as first child (assumed hardcoded)
-
-            validCategories.forEach(cat => {
-                const btn = document.createElement('button');
-                btn.className = `category-sheet-btn flex flex-col items-center justify-center p-4 rounded-2xl bg-gray-50 hover:bg-emerald-50 border border-transparent hover:border-emerald-200 transition-all`;
-                btn.onclick = () => filterByCategory(cat);
-
-                // Content
-                const icon = iconMap[cat] || '📦';
-                btn.innerHTML = `
-                    <div class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-xl mb-2">${icon}</div>
-                    <span class="text-xs font-medium text-gray-700">${cat}</span>
-                `;
-
-                sheetGrid.appendChild(btn);
-            });
-
-        });
-
-        // --- State ---
-        let currentCategory = 'all';
-        let currentSearch = '';
-        let currentSort = 'expiry-asc';
-
-        // --- Search Logic ---
-        const searchInput = document.getElementById('app-search-input');
-        const searchOverlay = document.getElementById('search-overlay');
-        const inventoryGrid = document.getElementById('inventory-grid');
-        const noResults = document.getElementById('no-results');
-
-        function toggleSearch() {
-            if (searchOverlay.classList.contains('translate-x-full')) {
-                // Open
-                searchOverlay.classList.remove('translate-x-full');
-                setTimeout(() => searchInput.focus(), 100);
-            } else {
-                // Close
-                searchOverlay.classList.add('translate-x-full');
-                searchInput.value = '';
-                currentSearch = '';
-                filterItems();
-            }
-        }
-
-        searchInput.addEventListener('input', (e) => {
-            currentSearch = e.target.value.toLowerCase();
-            filterItems();
-        });
-
-        // --- Category Filter Logic ---
-        const categoryLabel = document.getElementById('category-label');
-        const categoryIcon = document.getElementById('category-icon');
-        const categoryBtnWrapper = document.getElementById('header-category-btn');
-
-        function filterByCategory(category) {
-            currentCategory = category;
-
-            // Update Header Text & Style
-            categoryLabel.textContent = category === 'all' ? 'All food' : category;
-
-            // Update Icon logic
-            // (Simple swap if it was generic icon, but here we used FA icons for home vs Text)
-            // Just update text is fine as per design. maybe bold it.
-
-            if (category !== 'all') {
-                categoryBtnWrapper.classList.add('bg-emerald-50');
-                categoryIcon.className = "fas fa-filter text-sm"; // change icon to indicate filter
-            } else {
-                categoryBtnWrapper.classList.remove('bg-emerald-50');
-                categoryIcon.className = "fas fa-home text-sm";
-            }
-
-            filterItems();
-            closeCategorySheet();
-        }
-
-        function filterItems() {
-            const items = Array.from(document.querySelectorAll('.inventory-item'));
-            let visibleCount = 0;
-
-            items.forEach(item => {
-                const name = item.getAttribute('data-name');
-                const category = item.getAttribute('data-category');
-
-                const matchesSearch = name.includes(currentSearch);
-                const matchesCategory = currentCategory === 'all' || category === currentCategory;
-
-                if (matchesSearch && matchesCategory) {
-                    item.classList.remove('hidden');
-                    visibleCount++;
-                } else {
-                    item.classList.add('hidden');
-                }
-            });
-
-            if (visibleCount === 0) {
-                noResults.classList.remove('hidden');
-            } else {
-                noResults.classList.add('hidden');
-            }
-        }
-
-        // --- Sheets Logic ---
-        function openCategorySheet() {
-            document.getElementById('category-sheet-overlay').classList.remove('hidden');
-            document.getElementById('category-sheet').classList.remove('translate-y-full');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeCategorySheet() {
-            document.getElementById('category-sheet-overlay').classList.add('hidden');
-            document.getElementById('category-sheet').classList.add('translate-y-full');
-            document.body.style.overflow = '';
-        }
-
-        function openFilterSheet() {
-            document.getElementById('filter-sheet-overlay').classList.remove('hidden');
-            document.getElementById('filter-sheet').classList.remove('translate-y-full');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeFilterSheet() {
-            document.getElementById('filter-sheet-overlay').classList.add('hidden');
-            document.getElementById('filter-sheet').classList.add('translate-y-full');
-            document.body.style.overflow = '';
-        }
-
-        // --- Sort Logic (Reuse existing) ---
-        function applySort(sortType) {
-            currentSort = sortType;
-            // Update buttons visual state
-            document.querySelectorAll('.sort-btn').forEach(btn => {
-                // reset logic needs to be robust, just simple class swap for now
-                btn.classList.remove('active', 'ring-emerald-500', 'bg-emerald-50', 'text-emerald-700');
-                btn.classList.add('ring-gray-200', 'text-gray-600');
-            });
-            // highlight logic would go here if we tracked the button element
-
-            const items = Array.from(document.querySelectorAll('.inventory-item'));
-            items.sort((a, b) => {
-                if (sortType === 'expiry-asc') {
-                    return parseInt(a.getAttribute('data-expiry-days')) - parseInt(b.getAttribute('data-expiry-days'));
-                } else if (sortType === 'expiry-desc') {
-                    return parseInt(b.getAttribute('data-expiry-days')) - parseInt(a.getAttribute('data-expiry-days'));
-                } else if (sortType === 'alpha-asc') {
-                    return a.getAttribute('data-name').localeCompare(b.getAttribute('data-name'));
-                } else if (sortType === 'date-desc') {
-                    return parseInt(b.getAttribute('data-created')) - parseInt(a.getAttribute('data-created'));
-                }
-            });
-
-            items.forEach(item => inventoryGrid.appendChild(item));
-            closeFilterSheet();
-
-            const indicator = document.getElementById('filter-active-indicator');
-            if (sortType !== 'expiry-asc') indicator.classList.remove('hidden');
-            else indicator.classList.add('hidden');
-        }
-
-        function resetFilters() {
-            currentCategory = 'all';
-            currentSearch = '';
-            currentSort = 'expiry-asc';
-
-            // UI Resets
-            if (!searchOverlay.classList.contains('translate-x-full')) toggleSearch();
-            filterByCategory('all');
-            applySort('expiry-asc');
-            closeFilterSheet();
-        }
-
-
     <style>
-        /* Hide scrollbar for Chrome, Safari and Opera */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
 
-        /* Hide scrollbar for IE, Edge and Firefox */
         .no-scrollbar {
             -ms-overflow-style: none;
-            /* IE and Edge */
             scrollbar-width: none;
-            /* Firefox */
         }
 
         @keyframes fadeInUp {
@@ -567,6 +322,244 @@
         .animate-fade-in-up {
             animation: fadeInUp 0.3s ease-out;
         }
+
+        @media (max-width: 768px) {
+            .min-h-screen>nav.md\:hidden {
+                display: none !important;
+            }
+        }
     </style>
 
-    <% - include('../partials/footer') %>
+    <script>
+        // --- Data & Helpers ---
+        const categoryKeywords = {
+            'Dairy': ['milk', 'cheese', 'butter', 'yogurt', 'cream', 'egg', 'margarine'],
+            'Produce': ['apple', 'banana', 'orange', 'fruit', 'veg', 'potato', 'onion', 'carrot', 'tomato', 'lettuce', 'spinach', 'broccoli', 'avocado', 'cucumber', 'garlic', 'lemon', 'lime', 'grape'],
+            'Meat': ['chicken', 'beef', 'steak', 'pork', 'fish', 'salmon', 'tuna', 'meat', 'ham', 'bacon'],
+            'Bakery': ['bread', 'bagel', 'bun', 'toast', 'croissant', 'cake', 'muffin', 'tortilla'],
+            'Pantry': ['rice', 'pasta', 'cereal', 'oat', 'sugar', 'flour', 'oil', 'salt', 'pepper', 'spice', 'sauce', 'honey', 'jam', 'peanut', 'chocolate', 'snack', 'chip'],
+            'Beverages': ['juice', 'soda', 'water', 'beer', 'wine', 'coffee', 'tea', 'drink']
+        };
+        const iconMap = { 'Dairy': '🧀', 'Produce': '🥬', 'Meat': '🥩', 'Bakery': '🍞', 'Pantry': '🥫', 'Beverages': '🧃', 'Others': '📦', 'all': '🏠' };
+
+        function getCategory(name) {
+            name = name.toLowerCase();
+            for (const [cat, keywords] of Object.entries(categoryKeywords)) {
+                if (keywords.some(k => name.includes(k))) return cat;
+            }
+            return 'Others';
+        }
+
+        // --- Init ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Init Categories in Grid
+            document.querySelectorAll('.inventory-item').forEach(item => {
+                const name = item.getAttribute('data-name');
+                const cat = getCategory(name);
+                item.setAttribute('data-category', cat);
+                const iconEl = item.querySelector('.item-icon');
+                if (iconEl) iconEl.textContent = iconMap[cat] || '📦';
+            });
+
+            // Init Category Sheet Grid
+            const grid = document.getElementById('category-sheet-grid');
+            // 'All' is already there
+            const validCats = new Set();
+            document.querySelectorAll('.inventory-item').forEach(i => validCats.add(i.getAttribute('data-category')));
+
+            validCats.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = "flex flex-col items-center justify-center p-4 rounded-2xl bg-gray-50 hover:bg-emerald-50 border border-transparent hover:border-emerald-200 transition-all";
+                btn.onclick = () => filterByCategory(cat);
+                btn.innerHTML = `<div class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-xl mb-2">${iconMap[cat] || '📦'}</div><span class="text-xs font-medium text-gray-700">${cat}</span>`;
+                grid.appendChild(btn);
+            });
+        });
+
+        // --- Filters ---
+        let currentCategory = 'all';
+        let currentSearch = '';
+        const searchInput = document.getElementById('app-search-input');
+        const searchOverlay = document.getElementById('search-overlay');
+
+        function toggleSearch() {
+            if (searchOverlay.classList.contains('translate-x-full')) {
+                searchOverlay.classList.remove('translate-x-full');
+                setTimeout(() => searchInput.focus(), 100);
+            } else {
+                searchOverlay.classList.add('translate-x-full');
+                searchInput.value = '';
+                currentSearch = '';
+                filterItems();
+            }
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            currentSearch = e.target.value.toLowerCase();
+            filterItems();
+        });
+
+        function filterByCategory(cat) {
+            currentCategory = cat;
+            document.getElementById('category-label').textContent = cat === 'all' ? 'All food' : cat;
+            const btn = document.getElementById('header-category-btn');
+            const icon = document.getElementById('category-icon');
+            if (cat !== 'all') {
+                btn.classList.add('bg-emerald-50');
+                icon.className = "fas fa-filter text-sm";
+            } else {
+                btn.classList.remove('bg-emerald-50');
+                icon.className = "fas fa-home text-sm";
+            }
+            filterItems();
+            closeCategorySheet();
+        }
+
+        function filterItems() {
+            let visible = 0;
+            document.querySelectorAll('.inventory-item').forEach(item => {
+                const name = item.getAttribute('data-name');
+                const cat = item.getAttribute('data-category');
+                const matchSearch = name.includes(currentSearch);
+                const matchCat = currentCategory === 'all' || cat === currentCategory;
+                if (matchSearch && matchCat) {
+                    item.classList.remove('hidden');
+                    visible++;
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+            const noRes = document.getElementById('no-results');
+            if (visible === 0) noRes.classList.remove('hidden');
+            else noRes.classList.add('hidden');
+        }
+
+        // --- Sheets ---
+        function openCategorySheet() { document.getElementById('category-sheet-overlay').classList.remove('hidden'); document.getElementById('category-sheet').classList.remove('translate-y-full'); document.body.style.overflow = 'hidden'; }
+        function closeCategorySheet() { document.getElementById('category-sheet-overlay').classList.add('hidden'); document.getElementById('category-sheet').classList.add('translate-y-full'); document.body.style.overflow = ''; }
+        function openFilterSheet() { document.getElementById('filter-sheet-overlay').classList.remove('hidden'); document.getElementById('filter-sheet').classList.remove('translate-y-full'); document.body.style.overflow = 'hidden'; }
+        function closeFilterSheet() { document.getElementById('filter-sheet-overlay').classList.add('hidden'); document.getElementById('filter-sheet').classList.add('translate-y-full'); document.body.style.overflow = ''; }
+
+        // --- Sorting ---
+        function applySort(type) {
+            const grid = document.getElementById('inventory-grid');
+            const items = Array.from(grid.children);
+            items.sort((a, b) => {
+                if (type === 'expiry-asc') return parseInt(a.getAttribute('data-expiry-days')) - parseInt(b.getAttribute('data-expiry-days'));
+                if (type === 'expiry-desc') return parseInt(b.getAttribute('data-expiry-days')) - parseInt(a.getAttribute('data-expiry-days'));
+                if (type === 'alpha-asc') return a.getAttribute('data-name').localeCompare(b.getAttribute('data-name'));
+                if (type === 'date-desc') return parseInt(b.getAttribute('data-created')) - parseInt(a.getAttribute('data-created'));
+            });
+            items.forEach(i => grid.appendChild(i));
+
+            document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active', 'ring-emerald-500', 'bg-emerald-50', 'text-emerald-700'));
+            // Visual update logic simplified for brevity
+
+            closeFilterSheet();
+            const ind = document.getElementById('filter-active-indicator');
+            if (type !== 'expiry-asc') ind.classList.remove('hidden'); else ind.classList.add('hidden');
+        }
+
+        function resetFilters() {
+            currentCategory = 'all'; currentSearch = '';
+            if (!searchOverlay.classList.contains('translate-x-full')) toggleSearch();
+            filterByCategory('all');
+            applySort('expiry-asc');
+        }
+
+        // --- Batch Add Logic ---
+        let pendingItems = [];
+        const modal = document.getElementById('batchAddModal');
+
+        function openModal() { modal.classList.remove('hidden'); renderPendingList(); }
+        function closeModal() { modal.classList.add('hidden'); }
+
+        function addToBatch(name, shelf) {
+            pendingItems.push({ name, quantity: 1, shelfLife: shelf || 7, daysOld: 0, id: Date.now() });
+            renderPendingList();
+        }
+
+        function removeFromBatch(idx) { pendingItems.splice(idx, 1); renderPendingList(); }
+
+        function updatePendingItem(idx, field, delta) {
+            const item = pendingItems[idx];
+            if (!item) return;
+            if (field === 'quantity') item.quantity = Math.max(1, item.quantity + delta);
+            if (field === 'daysOld') item.daysOld = Math.max(0, item.daysOld + delta);
+            renderPendingList();
+        }
+
+        function renderPendingList() {
+            const listEl = document.getElementById('pending-list');
+            const section = document.getElementById('pending-section');
+            const count = document.getElementById('pending-count-label');
+            const btn = document.getElementById('btn-add-all');
+
+            count.textContent = `${pendingItems.length} items pending`;
+            btn.disabled = pendingItems.length === 0;
+
+            if (pendingItems.length === 0) {
+                section.classList.add('hidden');
+                listEl.innerHTML = '';
+                return;
+            }
+            section.classList.remove('hidden');
+            listEl.innerHTML = pendingItems.map((item, idx) => `
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                <div class="flex-1">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="font-bold text-gray-900">${item.name}</span>
+                        <button onclick="removeFromBatch(${idx})" class="text-gray-400 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center bg-white rounded-lg border border-gray-200 shadow-sm h-8">
+                            <button onclick="updatePendingItem(${idx}, 'quantity', -1)" class="px-2 text-gray-500 hover:text-emerald-600 border-r border-gray-100"><i class="fas fa-minus text-[10px]"></i></button>
+                            <span class="px-2 text-xs font-bold w-8 text-center">${item.quantity}</span>
+                            <button onclick="updatePendingItem(${idx}, 'quantity', 1)" class="px-2 text-gray-500 hover:text-emerald-600 border-l border-gray-100"><i class="fas fa-plus text-[10px]"></i></button>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-[10px] text-gray-500 uppercase">Age</span>
+                            <div class="flex items-center bg-white rounded-lg border border-gray-200 shadow-sm h-8">
+                                <button onclick="updatePendingItem(${idx}, 'daysOld', -1)" class="px-2 text-gray-500 hover:text-emerald-600 border-r border-gray-100"><i class="fas fa-minus text-[10px]"></i></button>
+                                <span class="px-2 text-xs font-bold w-8 text-center">${item.daysOld}d</span>
+                                <button onclick="updatePendingItem(${idx}, 'daysOld', 1)" class="px-2 text-gray-500 hover:text-emerald-600 border-l border-gray-100"><i class="fas fa-plus text-[10px]"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        }
+
+        async function submitBatch() {
+            if (pendingItems.length === 0) return;
+            const btn = document.getElementById('btn-add-all');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Saving...';
+
+            try {
+                const res = await fetch('/inventory/add-batch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ items: pendingItems })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    pendingItems = [];
+                    closeModal();
+                    window.location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error adding items');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+    </script>
+
+    <%- include('../partials/footer') %>

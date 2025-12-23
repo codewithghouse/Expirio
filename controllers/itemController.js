@@ -138,7 +138,8 @@ exports.getItems = async (req, res) => {
             title: `${urlStatus.charAt(0).toUpperCase() + urlStatus.slice(1)} Items - Expirio`,
             user: req.user,
             items,
-            currentStatus: urlStatus
+            currentStatus: urlStatus,
+            suggestions
         });
     } catch (err) {
         console.error(err);
