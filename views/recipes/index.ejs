@@ -13,41 +13,95 @@
       </div>
       <p class="text-gray-500 mb-8">Reduce waste by cooking with what you have.</p>
 
-      <!-- Inventory Summary -->
-      <div class="bg-white shadow sm:rounded-lg mb-8">
-        <div class="px-4 py-5 sm:p-6">
-          <h3 class="text-lg font-medium text-gray-900">Your Kitchen Inventory</h3>
-          <p class="mt-2 text-sm text-gray-500">
-            We found <strong>
-              <%= items.length %>
-            </strong> valid ingredients.
-          </p>
+      <!-- Kitchen Inventory Section -->
+      <div class="mb-8">
+        <div class="flex items-center justify-between px-1 mb-4">
+          <h3 class="text-lg font-bold text-gray-900 tracking-tight">Your Kitchen</h3>
+          <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+            <%= items.length %> items
+          </span>
+        </div>
 
-          <div class="mt-4 flex flex-wrap gap-2">
+        <!-- MOBILE: Horizontal Card Scroll -->
+        <!-- flex-nowrap + overflow-x-auto + w-32 fixed width = swipeable cards -->
+        <div class="md:hidden w-full overflow-x-auto pb-4 no-scrollbar-mobile">
+          <div class="flex flex-nowrap gap-3 px-1">
+
             <% items.forEach(item=> { %>
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-              <%= item.status === 'expiring'
-                ? 'bg-yellow-100 text-yellow-800'
-                : 'bg-green-100 text-green-800' %>">
-                <%= item.name %>
-              </span>
+              <div
+                class="flex-none w-32 h-26 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center p-3 relative space-y-2">
+                <!-- Icon -->
+                <div
+                  class="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center text-lg text-emerald-600">
+                  <i class="fas fa-carrot"></i>
+                </div>
+                <!-- Name -->
+                <p
+                  class="text-xs font-bold text-gray-900 text-center w-full leading-tight line-clamp-2 overflow-hidden text-ellipsis px-1 uppercase tracking-wide">
+                  <%= item.name %>
+                </p>
+                <!-- Status Dot -->
+                <% if (item.status==='expiring' ) { %>
+                  <div class="absolute top-2 right-2 w-2 h-2 bg-amber-500 rounded-full"></div>
+                  <% } %>
+              </div>
               <% }) %>
-          </div>
 
-          <div class="mt-5">
-            <% if (hasItems) { %>
-              <form action="/recipes/generate" method="POST">
-                <button type="submit"
-                  class="inline-flex items-center px-6 py-3 text-base font-bold rounded-md text-white bg-emerald-500 hover:bg-emerald-600 transition">
-                  <i class="fas fa-magic mr-2"></i> Generate Recipes
-                </button>
-              </form>
-              <% } else { %>
-                <button disabled class="px-4 py-2 rounded-md text-gray-400 bg-gray-100 cursor-not-allowed">
-                  Add items to get suggestions
-                </button>
-                <% } %>
+                <!-- Add Button (Mobile) -->
+                <a href="/inventory?action=add"
+                  class="flex-none w-16 h-26 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 hover:text-emerald-600 hover:border-emerald-500 transition-colors">
+                  <i class="fas fa-plus text-xl mb-1"></i>
+                  <span class="text-[10px] font-bold uppercase">Add</span>
+                </a>
+
           </div>
+        </div>
+
+        <!-- DESKTOP: Grid Layout -->
+        <div class="hidden md:flex flex-wrap gap-4">
+          <% items.forEach(item=> { %>
+            <div
+              class="w-40 h-32 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center p-4 relative hover:shadow-md transition-shadow">
+              <div
+                class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-xl text-emerald-600 mb-3">
+                <i class="fas fa-carrot"></i>
+              </div>
+              <p
+                class="text-sm font-bold text-gray-900 text-center w-full leading-tight line-clamp-2 uppercase tracking-wide">
+                <%= item.name %>
+              </p>
+              <% if (item.status==='expiring' ) { %>
+                <span class="absolute top-3 right-3 w-2 h-2 bg-amber-500 rounded-full"></span>
+                <% } %>
+            </div>
+            <% }) %>
+
+              <!-- Add Button (Desktop) -->
+              <a href="/inventory?action=add"
+                class="w-40 h-32 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 hover:text-emerald-600 hover:border-emerald-500 transition-colors group">
+                <div
+                  class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center mb-2 group-hover:border-emerald-200">
+                  <i class="fas fa-plus"></i>
+                </div>
+                <span class="text-xs font-bold uppercase tracking-widest">Add Item</span>
+              </a>
+        </div>
+
+        <!-- Action Section -->
+        <div class="mt-4 px-1">
+          <% if (hasItems) { %>
+            <form action="/recipes/generate" method="POST">
+              <button type="submit"
+                class="w-full inline-flex justify-center items-center px-6 py-4 text-base font-bold rounded-xl text-white bg-gray-900 hover:bg-black shadow-lg shadow-gray-200 transition-all transform active:scale-[0.98]">
+                <i class="fas fa-magic mr-2 text-emerald-400"></i> Generate Suggestions
+              </button>
+            </form>
+            <% } else { %>
+              <div class="text-center p-6 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                <p class="text-gray-500 font-medium">Your pantry is empty.</p>
+                <a href="/inventory" class="text-emerald-600 font-bold hover:underline">Add items now</a>
+              </div>
+              <% } %>
         </div>
       </div>
 

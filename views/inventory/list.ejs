@@ -3,6 +3,9 @@
     <!-- Custom Inventory Styles -->
     <link rel="stylesheet" href="/styles/inventory.css">
 
+    <!-- Barcode Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
     <!-- Sticky Search Header (Mobile) -->
     <div class="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm md:hidden" id="sticky-header">
         <div class="px-4 py-3 flex items-center gap-3">
@@ -44,10 +47,13 @@
                 </div>
             </div>
             <% } else { %>
-                <!-- Item Grid -->
-                <div id="inventory-grid" class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 pt-2">
-                    <% items.forEach(function(item) { /* Logic Calculation Block */ const today=new Date(); const
-                        expiry=new Date(item.expiryDate); const diffTime=expiry.getTime() - today.getTime(); const
+                <!-- SPLIT LAYOUTS: Mobile vs Desktop -->
+
+                <!-- MOBILE LAYOUT: Vertical Card Stack (md:hidden) -->
+                <!-- Strict Vertical List for robustness on small screens -->
+                <div id="mobile-inventory-list" class="flex flex-col gap-3 md:hidden pt-2 pb-24">
+                    <% items.forEach(function(item) { /* Shared Logic Block */ const today=new Date(); const expiry=new
+                        Date(item.expiryDate); const diffTime=expiry.getTime() - today.getTime(); const
                         diffDays=Math.ceil(diffTime / (1000 * 60 * 60 * 24)); let expiryText="" ; let
                         expiryColor="text-gray-500" ; let statusSortValue=0; if (diffDays> 0) {
                         expiryText = "Expires in " + diffDays + (diffDays !== 1 ? " days" : " day");
@@ -56,52 +62,85 @@
                             expiryText="Expires today" ; expiryColor="text-orange-600" ; statusSortValue=1; } else {
                             expiryText="Expired " + Math.abs(diffDays) + (Math.abs(diffDays) !==1 ? " days" : " day" )
                             + " ago" ; expiryColor="text-red-600" ; statusSortValue=0; } %>
-                            <div class="inventory-item group bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100 relative transition-all hover:shadow-md"
+                            <div class="inventory-item w-full bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center justify-between"
                                 data-name="<%= item.name.toLowerCase() %>" data-id="<%= item._id %>"
                                 data-status-val="<%= statusSortValue %>" data-expiry-days="<%= diffDays %>"
-                                data-created="<%= new Date(item.createdAt).getTime() %>" data-category="unknown">
+                                data-category="unknown">
 
-                                <div class="p-4 flex items-center">
+                                <div class="flex items-center flex-1 min-w-0">
                                     <div
-                                        class="flex-shrink-0 h-12 w-12 rounded-2xl bg-gray-50 flex items-center justify-center text-2xl shadow-inner mr-4 item-icon-container">
+                                        class="flex-shrink-0 w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-2xl mr-4">
                                         <span class="item-icon">📦</span>
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <div class="flex justify-between items-start">
-                                            <h3
-                                                class="text-base font-semibold text-gray-900 truncate item-name capitalize">
-                                                <%= item.name %>
-                                            </h3>
-                                            <form action="/inventory/<%= item._id %>?_method=DELETE" method="POST"
-                                                onsubmit="return confirm('Remove this item?');"
-                                                class="ml-2 opacity-0 group-hover:opacity-100 transition-opacity focus-within:opacity-100">
-                                                <button type="submit"
-                                                    class="text-gray-300 hover:text-red-500 p-1 rounded-full hover:bg-red-50 focus:outline-none">
-                                                    <i class="fas fa-trash-alt text-sm"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                        <div class="flex items-center mt-1">
-                                            <span
-                                                class="text-xs font-medium bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md mr-2">x
-                                                <%= item.quantity %></span>
-                                            <p class="text-xs font-medium <%= expiryColor %> flex items-center">
-                                                <i class="far fa-clock mr-1 text-[10px]"></i>
-                                                <%= expiryText %>
-                                            </p>
-                                        </div>
+                                        <h3 class="text-base font-bold text-gray-900 truncate capitalize">
+                                            <%= item.name %>
+                                        </h3>
+                                        <p class="text-xs font-medium <%= expiryColor %> flex items-center mt-1">
+                                            <i class="far fa-clock mr-1"></i>
+                                            <%= expiryText %>
+                                        </p>
                                     </div>
                                 </div>
 
-                                <% /* Progress Bar Logic */ let percentage=100; if (item.status !=='expired' ) { const
-                                    totalLife=item.shelfLife || 7; const daysLeft=diffDays < 0 ? 0 : diffDays;
-                                    percentage=Math.max(0, Math.min(100, (daysLeft / totalLife) * 100)); } else {
-                                    percentage=0; } let progressColor='bg-emerald-500' ; if (percentage < 50)
-                                    progressColor='bg-yellow-500' ; if (percentage < 20) progressColor='bg-red-500' ; %>
-                                    <div class="absolute bottom-0 left-0 w-full h-1 bg-gray-50">
-                                        <div class="h-full <%= progressColor %> transition-all duration-500"
-                                            style="width: <%= percentage %>%"></div>
+                                <div class="flex items-center ml-4">
+                                    <span class="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded-lg">x<%=
+                                            item.quantity %></span>
+                                    <form action="/inventory/<%= item._id %>?_method=DELETE" method="POST"
+                                        onsubmit="return confirm('Remove?');" class="ml-3">
+                                        <button type="submit" class="text-gray-300 hover:text-red-500 p-2">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <% }); %>
+                </div>
+
+
+                <!-- DESKTOP LAYOUT: Grid (hidden md:grid) -->
+                <div id="desktop-inventory-grid" class="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+                    <% items.forEach(function(item) { /* Shared Logic Block */ const today=new Date(); const expiry=new
+                        Date(item.expiryDate); const diffTime=expiry.getTime() - today.getTime(); const
+                        diffDays=Math.ceil(diffTime / (1000 * 60 * 60 * 24)); let expiryText="" ; let
+                        expiryColor="text-gray-500" ; let statusSortValue=0; if (diffDays> 0) {
+                        expiryText = diffDays + (diffDays !== 1 ? " days" : " day");
+                        if (diffDays <= 3) { expiryColor="text-amber-600" ; statusSortValue=2; } else {
+                            expiryColor="text-emerald-600" ; statusSortValue=3; } } else if (diffDays===0) {
+                            expiryText="Today" ; expiryColor="text-orange-600" ; statusSortValue=1; } else {
+                            expiryText=Math.abs(diffDays) + "d ago" ; expiryColor="text-red-600" ; statusSortValue=0; }
+                            %>
+                            <div class="inventory-item group bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-all relative overflow-hidden"
+                                data-name="<%= item.name.toLowerCase() %>" data-id="<%= item._id %>"
+                                data-status-val="<%= statusSortValue %>" data-expiry-days="<%= diffDays %>"
+                                data-category="unknown">
+
+                                <div class="flex justify-between items-start mb-4">
+                                    <div
+                                        class="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center text-xl">
+                                        <span class="item-icon">📦</span>
                                     </div>
+                                    <span
+                                        class="text-xs font-bold <%= expiryColor %> bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
+                                        <%= expiryText %>
+                                    </span>
+                                </div>
+
+                                <h3 class="text-lg font-bold text-gray-900 truncate mb-1 capitalize">
+                                    <%= item.name %>
+                                </h3>
+                                <div class="flex justify-between items-center text-sm text-gray-500">
+                                    <span>Qty: <span class="font-bold text-gray-700">
+                                            <%= item.quantity %>
+                                        </span></span>
+                                    <form action="/inventory/<%= item._id %>?_method=DELETE" method="POST"
+                                        onsubmit="return confirm('Remove?');"
+                                        class="opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button type="submit" class="text-gray-300 hover:text-red-500 px-2">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                             <% }); %>
                 </div>
@@ -172,10 +211,20 @@
                     </div>
                 </div>
                 <!-- Manual/Scan -->
-                <div class="p-5 rounded-2xl bg-white border border-dashed border-gray-300 text-center">
-                    <p class="text-xs text-gray-500 mb-4">Can't find what you're looking for?</p>
-                    <div class="flex space-x-3 justify-center">
-                        <button onclick="alert('Scanner requires HTTPS')"
+                <div class="p-5 rounded-2xl bg-white border border-dashed border-gray-300 text-center relative">
+                    <!-- Scanner Container (Hidden by default) -->
+                    <div id="scanner-container"
+                        class="hidden w-full h-64 bg-black rounded-xl overflow-hidden mb-4 relative">
+                        <div id="reader" class="w-full h-full"></div>
+                        <button onclick="stopScanner()"
+                            class="absolute top-2 right-2 p-2 bg-white/20 backdrop-blur-md text-white rounded-full z-10">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <p class="text-xs text-gray-500 mb-4" id="scan-instruction">Can't find what you're looking for?</p>
+                    <div class="flex space-x-3 justify-center" id="scan-buttons">
+                        <button onclick="startScanner()"
                             class="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 shadow-sm flex items-center justify-center active:bg-gray-100">
                             <i class="fas fa-barcode mr-2 text-gray-400"></i> Scan Barcode
                         </button>

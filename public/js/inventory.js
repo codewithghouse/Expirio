@@ -28,6 +28,8 @@ const iconMap = {
 let currentCategory = 'all';
 let currentSearch = '';
 let pendingItems = [];
+let html5QrcodeScanner = null;
+
 
 // --- Helpers ---
 function getCategory(name) {
@@ -229,11 +231,82 @@ function openModal() {
 }
 
 function closeModal() {
+    stopScanner(); // Ensure scanner stops when modal closes
     const modal = document.getElementById('batchAddModal');
     if (modal) {
         modal.classList.add('hidden');
     }
 }
+
+// --- Barcode Scanner Logic ---
+function startScanner() {
+    const container = document.getElementById('scanner-container');
+    const buttons = document.getElementById('scan-buttons');
+    const instruction = document.getElementById('scan-instruction');
+
+    if (container) container.classList.remove('hidden');
+    if (buttons) buttons.classList.add('hidden');
+    if (instruction) instruction.innerText = "Point camera at a barcode";
+
+    if (!html5QrcodeScanner) {
+        // Double check library loading
+        if (typeof Html5QrcodeScanner === 'undefined') {
+            alert("Scanner library not loaded. Please refresh.");
+            return;
+        }
+
+        html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader",
+            { fps: 10, qrbox: { width: 250, height: 250 } },
+            /* verbose= */ false
+        );
+
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    }
+}
+
+function stopScanner() {
+    const container = document.getElementById('scanner-container');
+    const buttons = document.getElementById('scan-buttons');
+    const instruction = document.getElementById('scan-instruction');
+
+    if (html5QrcodeScanner) {
+        try {
+            html5QrcodeScanner.clear().then(() => {
+                html5QrcodeScanner = null;
+            }).catch(error => {
+                console.error("Failed to clear html5QrcodeScanner. ", error);
+            });
+        } catch (e) {
+            console.warn("Scanner clear error", e);
+            html5QrcodeScanner = null;
+        }
+    }
+
+    if (container) container.classList.add('hidden');
+    if (buttons) buttons.classList.remove('hidden');
+    if (instruction) instruction.innerText = "Can't find what you're looking for?";
+}
+
+function onScanSuccess(decodedText, decodedResult) {
+    // Play beep sound if possible (optional, browser policy dependent)
+    // const audio = new Audio('/sounds/beep.mp3'); audio.play().catch(e=>{});
+
+    stopScanner();
+    // Improve UX: Show result slightly before adding or just add
+    // Ideally we'd look up the barcode in a DB, but for now we auto-fill name
+    // and let user edit.
+    // If text looks like EAN/UPC, we might want to fetch name. 
+    // For this generic implementation:
+    addToBatch(`Item ${decodedText}`, 7);
+    alert(`Scanned: ${decodedText}`);
+}
+
+function onScanFailure(error) {
+    // handle scan failure, usually better to ignore and keep scanning.
+    // console.warn(`Code scan error = ${error}`);
+}
+
 
 function addToBatch(name, shelf) {
     // Add new item with default quantity 1 and age 0
