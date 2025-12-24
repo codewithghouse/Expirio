@@ -47,8 +47,8 @@
                         </div>
                         <% } %>
 
-                            <div class="min-h-screen bg-gray-100 flex flex-col pb-24 md:pb-0">
-                                <!-- Added padding bottom for mobile nav -->
+                            <!-- Page Container without padding, padding is on Main -->
+                            <div class="min-h-screen bg-gray-100 flex flex-col">
 
                                 <!-- Mobile Header (Logo + Alerts) -->
                                 <nav
@@ -149,4 +149,5 @@
                                         </div>
                                     </div>
                                 </nav>
-                                <main class="flex-grow">
+                                <!-- Apply safe mobile padding to Main -->
+                                <main class="flex-grow w-full pb-[80px] md:pb-0">
