@@ -21,25 +21,35 @@
                 <% } %>
         </header>
 
-        <!-- 2. IMPACT CARD (NEW) -->
-        <section
-            class="mb-8 relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-brand-600 to-brand-800 text-white shadow-xl shadow-brand-200">
-            <div class="absolute top-0 right-0 p-8 opacity-10">
-                <i class="fas fa-leaf text-9xl transform rotate-12 translate-x-4 -translate-y-4"></i>
+        <!-- 2. IMPACT TRACKER CARD (Mobile-First, High Contrast) -->
+        <section class="mb-8 relative overflow-hidden rounded-3xl shadow-lg"
+            style="background-color: #ecfdf5; border: 2px solid #a7f3d0;">
+
+            <!-- Decorative Icon -->
+            <div class="absolute top-0 right-0 p-6" style="opacity: 0.15;">
+                <i class="fas fa-leaf text-7xl transform rotate-12" style="color: #059669;"></i>
             </div>
+
+            <!-- Card Content -->
             <div class="relative p-6 z-10">
-                <div class="flex items-center gap-2 mb-2 text-brand-100">
-                    <i class="fas fa-magic text-sm"></i>
-                    <span class="text-xs font-bold uppercase tracking-wider">Impact Tracker</span>
+                <!-- Label -->
+                <div class="flex items-center gap-2 mb-3">
+                    <i class="fas fa-seedling text-sm" style="color: #059669;"></i>
+                    <span class="text-xs font-bold uppercase tracking-widest" style="color: #047857;">IMPACT
+                        TRACKER</span>
                 </div>
-                <div class="flex items-end gap-2 mb-2">
-                    <span class="text-4xl font-bold">
+
+                <!-- Main Metric -->
+                <div class="flex items-baseline gap-3 mb-3">
+                    <span class="text-5xl font-extrabold leading-none" style="color: #065f46;">
                         <%= stats.fresh %>
                     </span>
-                    <span class="text-lg font-medium mb-1 text-brand-100">items saved</span>
+                    <span class="text-xl font-semibold" style="color: #059669;">items saved</span>
                 </div>
-                <p class="text-sm text-brand-50 opacity-90 leading-relaxed">
-                    Good job! Keeping food fresh reduces your carbon footprint.
+
+                <!-- Description -->
+                <p class="text-sm leading-relaxed font-medium" style="color: #374151;">
+                    Great work! You're reducing food waste and your carbon footprint.
                 </p>
             </div>
         </section>
@@ -161,4 +171,4 @@
 
     </div>
 
-    <%- include('.partials/footer') %>
+    <%- include('partials/footer') %>

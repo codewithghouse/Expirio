@@ -67,13 +67,9 @@
                                         <!-- Actions -->
                                         <% if(typeof user !='undefined' ) { %>
                                             <div class="flex items-center gap-3">
-                                                <a href="/alerts"
+                                                <a href="/plans"
                                                     class="relative w-9 h-9 flex items-center justify-center rounded-full bg-gray-50 text-gray-500 hover:text-brand-600 hover:bg-brand-50 transition-all">
-                                                    <i class="far fa-bell text-lg"></i>
-                                                    <% if(typeof stats !='undefined' && stats.unreadAlerts> 0) { %>
-                                                        <span
-                                                            class="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
-                                                        <% } %>
+                                                    <i class="fas fa-user-circle text-lg"></i>
                                                 </a>
                                             </div>
                                             <% } %>

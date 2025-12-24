@@ -13,6 +13,9 @@ router.get('/fresh', itemController.getItems);
 router.get('/expiring', itemController.getItems);
 router.get('/expired', itemController.getItems);
 
+// Increment quantity
+router.post('/:id/increment', itemController.incrementItem);
+
 router.delete('/:id', itemController.deleteItem);
 
 module.exports = router;

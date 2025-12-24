@@ -1,6 +1,6 @@
 /**
  * Inventory Management Logic
- * Handles client-side filtering, sorting, and batch item addition.
+ * Handles client-side filtering, sorting, search, and quantity management.
  */
 
 // --- Data Configuration ---
@@ -25,6 +25,7 @@ const iconMap = {
 };
 
 // --- State ---
+let currentStatus = 'all';  // NEW: for status filtering (all, fresh, expiring, expired)
 let currentCategory = 'all';
 let currentSearch = '';
 let pendingItems = [];
@@ -39,6 +40,7 @@ function getCategory(name) {
     }
     return 'Others';
 }
+
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -58,12 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
         validCats.add(cat);
     });
 
-    // 2. Initialize Filter Categories Grid
+    // 2. Initialize Filter Categories Grid (in Sort/Filter panel)
     const grid = document.getElementById('unified-category-grid');
     if (grid) {
-        // Clear existing except 'All' if strictly managed, but here appending is safer based on previous logic
-        // We assume 'All' is hardcoded in HTML or we append others.
-        // Let's keep 'All' in HTML and append others.
         validCats.forEach(cat => {
             const btn = document.createElement('button');
             btn.className = "cat-btn bg-gray-50 text-gray-600 border border-transparent hover:bg-emerald-50 hover:border-emerald-200 flex flex-col items-center justify-center p-3 rounded-2xl shadow-sm transition-all";
@@ -86,18 +85,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 4. Initial Sort (Logic Only, No UI trigger)
+    // 4. Initial Sort
     applySort('expiry-asc');
+
+    // 5. Set initial tab state
+    updateTabPillStyles();
 });
 
-// --- Core Filtering Logic ---
-function filterByCategory(cat) {
-    currentCategory = cat;
 
-    // Update visual state of category buttons
+// --- NEW: Status-based Filtering (All/Fresh/Expiring/Expired) ---
+function filterByStatus(status) {
+    currentStatus = status;
+    updateTabPillStyles();
+    filterItems();
+}
+
+// Alias for the filterByCategory function called by tabs
+// The horizontal tabs now filter by STATUS, not product category
+function filterByCategory(input) {
+    // If input is a status value (all, fresh, expiring, expired), use status filtering
+    if (['all', 'fresh', 'expiring', 'expired'].includes(input)) {
+        filterByStatus(input);
+        return;
+    }
+
+    // Otherwise it's a product category filter (from the Sort/Filter panel)
+    currentCategory = input;
+
+    // Update visual state of category buttons in the sort/filter panel
     document.querySelectorAll('.cat-btn').forEach(btn => {
         const titleSpan = btn.querySelector('span');
-        if (btn.dataset.cat === cat) {
+        if (btn.dataset.cat === input) {
             btn.className = "cat-btn bg-gray-900 text-white shadow-md transform scale-105 flex flex-col items-center justify-center p-3 rounded-2xl transition-all";
             if (titleSpan) titleSpan.className = "text-[10px] font-bold text-white";
         } else {
@@ -109,6 +127,33 @@ function filterByCategory(cat) {
     filterItems();
 }
 
+
+// --- Update Tab Pill Styles ---
+function updateTabPillStyles() {
+    const pills = document.querySelectorAll('.cat-pill');
+
+    pills.forEach(pill => {
+        // Get the status from the onclick attribute
+        const onclickAttr = pill.getAttribute('onclick') || '';
+        let pillStatus = 'all';
+
+        if (onclickAttr.includes("'all'")) pillStatus = 'all';
+        else if (onclickAttr.includes("'fresh'")) pillStatus = 'fresh';
+        else if (onclickAttr.includes("'expiring'")) pillStatus = 'expiring';
+        else if (onclickAttr.includes("'expired'")) pillStatus = 'expired';
+
+        if (pillStatus === currentStatus) {
+            // Active state
+            pill.className = "cat-pill whitespace-nowrap px-6 py-2.5 rounded-full bg-emerald-600 text-white text-sm font-bold shadow-lg shadow-emerald-200/50 transition-all transform active:scale-95 border border-transparent";
+        } else {
+            // Inactive state
+            pill.className = "cat-pill whitespace-nowrap px-6 py-2.5 rounded-full bg-white text-gray-600 border border-gray-100 text-sm font-bold shadow-sm transition-all transform active:scale-95 active:bg-gray-50";
+        }
+    });
+}
+
+
+// --- Core Filtering Logic ---
 function filterItems() {
     let visibleCount = 0;
     const items = document.querySelectorAll('.inventory-item');
@@ -116,11 +161,18 @@ function filterItems() {
     items.forEach(item => {
         const name = item.getAttribute('data-name');
         const cat = item.getAttribute('data-category');
+        const status = item.getAttribute('data-status');
 
-        const matchSearch = name.includes(currentSearch);
+        // Match search
+        const matchSearch = !currentSearch || name.includes(currentSearch);
+
+        // Match status (all/fresh/expiring/expired)
+        const matchStatus = currentStatus === 'all' || status === currentStatus;
+
+        // Match category (from sort/filter panel)
         const matchCat = currentCategory === 'all' || cat === currentCategory;
 
-        if (matchSearch && matchCat) {
+        if (matchSearch && matchStatus && matchCat) {
             item.classList.remove('hidden');
             visibleCount++;
         } else {
@@ -141,10 +193,76 @@ function filterItems() {
 function updateIndicators() {
     const indicator = document.getElementById('filter-active-indicator');
     if (indicator) {
-        if (currentCategory !== 'all') indicator.classList.remove('hidden');
-        else indicator.classList.add('hidden');
+        if (currentCategory !== 'all' || currentStatus !== 'all') {
+            indicator.classList.remove('hidden');
+        } else {
+            indicator.classList.add('hidden');
+        }
     }
 }
+
+
+// --- NEW: Quantity Increment Function ---
+async function incrementQuantity(itemId) {
+    const itemEl = document.querySelector(`[data-id="${itemId}"]`);
+    if (!itemEl) return;
+
+    // Get current quantity
+    let currentQty = parseInt(itemEl.getAttribute('data-quantity')) || 1;
+    const newQty = currentQty + 1;
+
+    // Optimistic UI update
+    itemEl.setAttribute('data-quantity', newQty);
+    const qtyDisplays = itemEl.querySelectorAll('.qty-display, span:contains("pcs")');
+
+    // Update the quantity display text
+    const qtyText = itemEl.querySelector('.text-gray-400');
+    if (qtyText && qtyText.textContent.includes('pcs')) {
+        qtyText.textContent = newQty + ' pcs';
+    }
+
+    // Also update any qty-display elements
+    itemEl.querySelectorAll('.qty-display').forEach(el => {
+        el.textContent = newQty;
+    });
+
+    // Find and update the mobile display (format: "X pcs")
+    const infoDiv = itemEl.querySelector('.flex.items-center.text-xs.font-semibold.gap-2');
+    if (infoDiv) {
+        const pcsSpan = infoDiv.querySelector('.text-gray-400');
+        if (pcsSpan) {
+            pcsSpan.textContent = newQty + ' pcs';
+        }
+    }
+
+    // Visual feedback on button
+    const btn = itemEl.querySelector('.qty-btn');
+    if (btn) {
+        btn.classList.add('ring-2', 'ring-emerald-300');
+        setTimeout(() => {
+            btn.classList.remove('ring-2', 'ring-emerald-300');
+        }, 200);
+    }
+
+    // Send to backend (fire-and-forget with error handling)
+    try {
+        const res = await fetch(`/inventory/${itemId}/increment`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!res.ok) {
+            // Revert on failure
+            itemEl.setAttribute('data-quantity', currentQty);
+            console.error('Failed to increment quantity');
+        }
+    } catch (e) {
+        console.error('Network error incrementing quantity:', e);
+        // Revert on failure
+        itemEl.setAttribute('data-quantity', currentQty);
+    }
+}
+
 
 // --- Sort & Filter Sheet UI Control ---
 function openSortFilter() {
@@ -152,6 +270,7 @@ function openSortFilter() {
     const panel = document.getElementById('sortFilterPanel');
     if (overlay && panel) {
         overlay.classList.remove('hidden');
+        panel.classList.remove('hidden');
         panel.classList.remove('translate-y-full');
         document.body.style.overflow = 'hidden';
     }
@@ -167,6 +286,7 @@ function closeSortFilter() {
     }
 }
 
+
 // --- Sorting Logic ---
 function handleSort(type) {
     applySort(type);
@@ -174,27 +294,31 @@ function handleSort(type) {
 }
 
 function applySort(type) {
-    const grid = document.getElementById('inventory-grid');
-    if (!grid) return;
+    // Sort both mobile and desktop lists
+    const mobileList = document.getElementById('mobile-inventory-list');
+    const desktopGrid = document.getElementById('desktop-inventory-grid');
 
-    const items = Array.from(grid.children);
+    [mobileList, desktopGrid].forEach(container => {
+        if (!container) return;
 
-    items.sort((a, b) => {
-        if (type === 'expiry-asc') {
-            return parseInt(a.getAttribute('data-expiry-days')) - parseInt(b.getAttribute('data-expiry-days'));
-        }
-        if (type === 'expiry-desc') {
-            return parseInt(b.getAttribute('data-expiry-days')) - parseInt(a.getAttribute('data-expiry-days'));
-        }
-        if (type === 'alpha-asc') {
-            return a.getAttribute('data-name').localeCompare(b.getAttribute('data-name'));
-        }
-        // Fallback or other types
-        return 0;
+        const items = Array.from(container.querySelectorAll('.inventory-item'));
+
+        items.sort((a, b) => {
+            if (type === 'expiry-asc') {
+                return parseInt(a.getAttribute('data-expiry-days')) - parseInt(b.getAttribute('data-expiry-days'));
+            }
+            if (type === 'expiry-desc') {
+                return parseInt(b.getAttribute('data-expiry-days')) - parseInt(a.getAttribute('data-expiry-days'));
+            }
+            if (type === 'alpha-asc') {
+                return a.getAttribute('data-name').localeCompare(b.getAttribute('data-name'));
+            }
+            return 0;
+        });
+
+        // Re-append sorted items
+        items.forEach(i => container.appendChild(i));
     });
-
-    // Re-append sorted items
-    items.forEach(i => grid.appendChild(i));
 
     // Update Sort Buttons UI
     document.querySelectorAll('.sort-btn').forEach(btn => {
@@ -216,10 +340,15 @@ function resetFilters() {
     if (searchInput) searchInput.value = '';
 
     currentSearch = '';
-    filterByCategory('all');
+    currentStatus = 'all';
+    currentCategory = 'all';
+
+    updateTabPillStyles();
+    filterItems();
     applySort('expiry-asc');
     closeSortFilter();
 }
+
 
 // --- Batch Add Modal Logic ---
 function openModal() {
@@ -231,12 +360,13 @@ function openModal() {
 }
 
 function closeModal() {
-    stopScanner(); // Ensure scanner stops when modal closes
+    stopScanner();
     const modal = document.getElementById('batchAddModal');
     if (modal) {
         modal.classList.add('hidden');
     }
 }
+
 
 // --- Barcode Scanner Logic ---
 function startScanner() {
@@ -249,7 +379,6 @@ function startScanner() {
     if (instruction) instruction.innerText = "Point camera at a barcode";
 
     if (!html5QrcodeScanner) {
-        // Double check library loading
         if (typeof Html5QrcodeScanner === 'undefined') {
             alert("Scanner library not loaded. Please refresh.");
             return;
@@ -258,7 +387,7 @@ function startScanner() {
         html5QrcodeScanner = new Html5QrcodeScanner(
             "reader",
             { fps: 10, qrbox: { width: 250, height: 250 } },
-            /* verbose= */ false
+            false
         );
 
         html5QrcodeScanner.render(onScanSuccess, onScanFailure);
@@ -289,27 +418,17 @@ function stopScanner() {
 }
 
 function onScanSuccess(decodedText, decodedResult) {
-    // Play beep sound if possible (optional, browser policy dependent)
-    // const audio = new Audio('/sounds/beep.mp3'); audio.play().catch(e=>{});
-
     stopScanner();
-    // Improve UX: Show result slightly before adding or just add
-    // Ideally we'd look up the barcode in a DB, but for now we auto-fill name
-    // and let user edit.
-    // If text looks like EAN/UPC, we might want to fetch name. 
-    // For this generic implementation:
     addToBatch(`Item ${decodedText}`, 7);
     alert(`Scanned: ${decodedText}`);
 }
 
 function onScanFailure(error) {
-    // handle scan failure, usually better to ignore and keep scanning.
-    // console.warn(`Code scan error = ${error}`);
+    // Ignore scan failures, keep scanning
 }
 
 
 function addToBatch(name, shelf) {
-    // Add new item with default quantity 1 and age 0
     pendingItems.push({
         name,
         quantity: 1,
@@ -346,11 +465,9 @@ function renderPendingList() {
 
     if (!listEl || !section) return;
 
-    // Update Header
     if (countLabel) countLabel.textContent = `${pendingItems.length} items pending`;
     if (submitBtn) submitBtn.disabled = pendingItems.length === 0;
 
-    // Show/Hide Section
     if (pendingItems.length === 0) {
         section.classList.add('hidden');
         listEl.innerHTML = '';
@@ -359,7 +476,6 @@ function renderPendingList() {
 
     section.classList.remove('hidden');
 
-    // Render Items
     listEl.innerHTML = pendingItems.map((item, idx) => `
         <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-gray-100 shadow-sm">
             <div class="flex-1">

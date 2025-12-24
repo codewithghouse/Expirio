@@ -158,3 +158,24 @@ exports.deleteItem = async (req, res) => {
         res.redirect('back');
     }
 };
+
+// Increment item quantity by 1
+exports.incrementItem = async (req, res) => {
+    try {
+        const item = await Item.findOneAndUpdate(
+            { _id: req.params.id, owner: req.user._id },
+            { $inc: { quantity: 1 } },
+            { new: true }
+        );
+
+        if (!item) {
+            return res.status(404).json({ success: false, message: 'Item not found' });
+        }
+
+        res.json({ success: true, quantity: item.quantity });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};
+

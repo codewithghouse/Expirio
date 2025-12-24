@@ -1,4 +1,4 @@
-<% // Helper for active state const isActive=(p)=> {
+<% /* Helper for active state */ const isActive=(p)=> {
     if (typeof path === 'undefined') return false;
     if (path === p) return true;
     if (p !== '/dashboard' && path && path.startsWith(p)) return true;
@@ -63,19 +63,19 @@
                     class="text-[10px] font-semibold tracking-wide <%= isActive('/recipes') ? 'text-brand-600' : 'text-gray-400 group-hover:text-gray-600' %>">Cook</span>
             </a>
 
-            <!-- Profile/Plans -->
-            <a href="/plans"
+            <!-- Alerts -->
+            <a href="/alerts"
                 class="group flex flex-col items-center justify-end w-16 mb-2 space-y-1 transition-colors duration-200">
                 <div
-                    class="relative p-1 rounded-xl transition-all duration-300 <%= isActive('/plans') ? 'text-brand-600 -translate-y-1' : 'text-gray-400 group-hover:text-gray-600' %>">
-                    <i class="fas fa-user-circle text-2xl"></i>
-                    <% if(isActive('/plans')) { %>
+                    class="relative p-1 rounded-xl transition-all duration-300 <%= isActive('/alerts') ? 'text-brand-600 -translate-y-1' : 'text-gray-400 group-hover:text-gray-600' %>">
+                    <i class="fas fa-bell text-2xl"></i>
+                    <% if(isActive('/alerts')) { %>
                         <span
                             class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand-600 rounded-full"></span>
                         <% } %>
                 </div>
                 <span
-                    class="text-[10px] font-semibold tracking-wide <%= isActive('/plans') ? 'text-brand-600' : 'text-gray-400 group-hover:text-gray-600' %>">Profile</span>
+                    class="text-[10px] font-semibold tracking-wide <%= isActive('/alerts') ? 'text-brand-600' : 'text-gray-400 group-hover:text-gray-600' %>">Alerts</span>
             </a>
         </div>
     </nav>

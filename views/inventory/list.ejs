@@ -77,22 +77,25 @@
                 <div id="mobile-inventory-list" class="flex flex-col gap-4 md:hidden pt-2">
                     <!-- Dynamic Headers for sections can be added via JS, keeping it simple list for now -->
 
-                    <% items.forEach(function(item) { /* Logic Block */ const today=new Date(); const expiry=new
-                        Date(item.expiryDate); const diffTime=expiry.getTime() - today.getTime(); const
+                    <% items.forEach(function(item) { /* Calculate expiry status */ const today=new Date(); const
+                        expiry=new Date(item.expiryDate); const diffTime=expiry.getTime() - today.getTime(); const
                         diffDays=Math.ceil(diffTime / (1000 * 60 * 60 * 24)); let expiryText="" ; let
-                        expiryColor="text-gray-400" ; let iconBg="bg-gray-50" ; let statusSortValue=0; if (diffDays> 0)
-                        {
-                        expiryText = diffDays + (diffDays !== 1 ? " days" : " day") + " left";
-                        if (diffDays <= 3) { expiryColor="text-amber-500" ; iconBg="bg-amber-50" ; statusSortValue=2; }
-                            else { expiryColor="text-emerald-500" ; iconBg="bg-emerald-50" ; statusSortValue=3; } } else
-                            if (diffDays===0) { expiryText="Expires TODAY" ; expiryColor="text-orange-500" ;
-                            iconBg="bg-orange-50" ; statusSortValue=1; } else { expiryText="Expired " +
-                            Math.abs(diffDays) + "d ago" ; expiryColor="text-red-500" ; iconBg="bg-red-50" ;
-                            statusSortValue=0; } %>
+                        expiryColor="text-gray-400" ; let iconBg="bg-gray-50" ; let status="fresh" ; /* NEW: status for
+                        filtering */ if (diffDays> 7) {
+                        expiryText = diffDays + " days left";
+                        expiryColor = "text-emerald-500";
+                        iconBg = "bg-emerald-50";
+                        status = "fresh";
+                        } else if (diffDays > 0 && diffDays <= 7) { expiryText=diffDays + (diffDays !==1 ? " days"
+                            : " day" ) + " left" ; expiryColor="text-amber-500" ; iconBg="bg-amber-50" ;
+                            status="expiring" ; } else if (diffDays===0) { expiryText="Expires TODAY" ;
+                            expiryColor="text-orange-500" ; iconBg="bg-orange-50" ; status="expiring" ; } else {
+                            expiryText="Expired " + Math.abs(diffDays) + "d ago" ; expiryColor="text-red-500" ;
+                            iconBg="bg-red-50" ; status="expired" ; } %>
                             <div class="inventory-item w-full bg-white rounded-[1.8rem] p-4 flex items-center justify-between shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-50/50"
                                 data-name="<%= item.name.toLowerCase() %>" data-id="<%= item._id %>"
-                                data-status-val="<%= statusSortValue %>" data-expiry-days="<%= diffDays %>"
-                                data-category="unknown">
+                                data-status="<%= status %>" data-expiry-days="<%= diffDays %>"
+                                data-quantity="<%= item.quantity %>" data-category="unknown">
 
                                 <!-- Left: Icon & Text -->
                                 <div class="flex items-center flex-1 min-w-0 gap-4">
@@ -127,10 +130,11 @@
                                     </div>
                                 </div>
 
-                                <!-- Right: Action Button -->
+                                <!-- Right: Quantity Increment Button -->
                                 <div class="flex items-center ml-2">
-                                    <button onclick="openItemActionSheet('<%= item._id %>', '<%= item.name %>')"
-                                        class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center active:scale-90 transition-transform shadow-sm border border-emerald-100/50">
+                                    <button onclick="incrementQuantity('<%= item._id %>')"
+                                        class="qty-btn w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center active:scale-90 transition-transform shadow-sm border border-emerald-100/50"
+                                        aria-label="Increase quantity">
                                         <i class="fas fa-plus text-sm"></i>
                                     </button>
                                 </div>
@@ -141,20 +145,22 @@
 
                 <!-- DESKTOP LAYOUT: Grid (hidden md:grid) -->
                 <div id="desktop-inventory-grid" class="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
-                    <% items.forEach(function(item) { /* Shared Logic Block */ const today=new Date(); const expiry=new
-                        Date(item.expiryDate); const diffTime=expiry.getTime() - today.getTime(); const
+                    <% items.forEach(function(item) { /* Calculate expiry status for desktop */ const today=new Date();
+                        const expiry=new Date(item.expiryDate); const diffTime=expiry.getTime() - today.getTime(); const
                         diffDays=Math.ceil(diffTime / (1000 * 60 * 60 * 24)); let expiryText="" ; let
-                        expiryColor="text-gray-500" ; let statusSortValue=0; if (diffDays> 0) {
-                        expiryText = diffDays + (diffDays !== 1 ? " days" : " day");
-                        if (diffDays <= 3) { expiryColor="text-amber-600" ; statusSortValue=2; } else {
-                            expiryColor="text-emerald-600" ; statusSortValue=3; } } else if (diffDays===0) {
-                            expiryText="Today" ; expiryColor="text-orange-600" ; statusSortValue=1; } else {
-                            expiryText=Math.abs(diffDays) + "d ago" ; expiryColor="text-red-600" ; statusSortValue=0; }
+                        expiryColor="text-gray-500" ; let status="fresh" ; if (diffDays> 7) {
+                        expiryText = diffDays + " days";
+                        expiryColor = "text-emerald-600";
+                        status = "fresh";
+                        } else if (diffDays > 0 && diffDays <= 7) { expiryText=diffDays + (diffDays !==1 ? " days"
+                            : " day" ); expiryColor="text-amber-600" ; status="expiring" ; } else if (diffDays===0) {
+                            expiryText="Today" ; expiryColor="text-orange-600" ; status="expiring" ; } else {
+                            expiryText=Math.abs(diffDays) + "d ago" ; expiryColor="text-red-600" ; status="expired" ; }
                             %>
                             <div class="inventory-item group bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-all relative overflow-hidden"
                                 data-name="<%= item.name.toLowerCase() %>" data-id="<%= item._id %>"
-                                data-status-val="<%= statusSortValue %>" data-expiry-days="<%= diffDays %>"
-                                data-category="unknown">
+                                data-status="<%= status %>" data-expiry-days="<%= diffDays %>"
+                                data-quantity="<%= item.quantity %>" data-category="unknown">
 
                                 <div class="flex justify-between items-start mb-4">
                                     <div
@@ -171,9 +177,16 @@
                                     <%= item.name %>
                                 </h3>
                                 <div class="flex justify-between items-center text-sm text-gray-500">
-                                    <span>Qty: <span class="font-bold text-gray-700">
-                                            <%= item.quantity %>
-                                        </span></span>
+                                    <div class="flex items-center gap-2">
+                                        <span>Qty: <span class="font-bold text-gray-700 qty-display">
+                                                <%= item.quantity %>
+                                            </span></span>
+                                        <button onclick="incrementQuantity('<%= item._id %>')"
+                                            class="qty-btn w-7 h-7 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center active:scale-90 transition-transform"
+                                            aria-label="Increase quantity">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
                                     <form action="/inventory/<%= item._id %>?_method=DELETE" method="POST"
                                         onsubmit="return confirm('Remove?');"
                                         class="opacity-0 group-hover:opacity-100 transition-opacity">

@@ -1,3 +1,48 @@
 @import "tailwindcss";
 
 @source "../../views";
+
+/* Tailwind v4 Theme Configuration */
+@theme {
+  --color-brand-50: #ecfdf5;
+  --color-brand-100: #d1fae5;
+  --color-brand-200: #a7f3d0;
+  --color-brand-300: #6ee7b7;
+  --color-brand-400: #34d399;
+  --color-brand-500: #10b981;
+  --color-brand-600: #059669;
+  --color-brand-700: #047857;
+  --color-brand-800: #065f46;
+  --color-brand-900: #064e3b;
+  --color-brand-950: #022c22;
+  
+  --color-sage-50: #f7fbf9;
+  --color-sage-100: #eef6f2;
+  --color-sage-200: #dcece5;
+  --color-sage-300: #c0dad0;
+  --color-sage-400: #9dbfb4;
+  --color-sage-500: #7da197;
+  --color-sage-600: #62837a;
+  --color-sage-700: #516a63;
+  --color-sage-800: #445652;
+  --color-sage-900: #3a4845;
+  
+  --font-sans: 'Inter', sans-serif;
+}
+
+/* Custom Utilities */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
