@@ -1,73 +1,33 @@
 </main>
-<footer class="bg-white border-t border-gray-200 mt-auto hidden md:block">
-    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <p class="text-center text-sm text-gray-500">
-            &copy; <%= new Date().getFullYear() %> Expirio. Stop Food Waste.
-        </p>
+<footer class="bg-white border-t border-gray-100 mt-auto hidden md:block">
+    <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center">
+            <p class="text-sm text-gray-500">
+                &copy; <%= new Date().getFullYear() %> Expirio. Stop Food Waste.
+            </p>
+            <div class="flex space-x-6">
+                <a href="#" class="text-gray-400 hover:text-gray-500"><i class="fab fa-github"></i></a>
+                <a href="#" class="text-gray-400 hover:text-gray-500"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
     </div>
 </footer>
 </div> <!-- Close inner wrapper -->
 
 <% if(typeof user !='undefined' ) { %>
-    <!-- Mobile Bottom Navigation -->
-    <nav class="md:hidden"
-        style="position: fixed; bottom: 0; left: 0; right: 0; width: 100%; z-index: 50; background-color: rgba(255,255,255,0.95); backdrop-filter: blur(8px); border-top: 1px solid #f3f4f6; padding-bottom: env(safe-area-inset-bottom, 10px); box-shadow: 0 -4px 20px rgba(0,0,0,0.03);">
-        <div class="flex justify-around items-center px-6 pt-3 pb-1">
-            <!-- 1. Home (Dashboard) -->
-            <a href="/dashboard"
-                class="flex flex-col items-center gap-1 min-w-[64px] transition-colors group <%= typeof title !='undefined' && title.includes('Dashboard') ? 'text-emerald-600' : 'text-gray-400 hover:text-gray-600' %>">
-                <div
-                    class="<%= typeof title !='undefined' && title.includes('Dashboard') ? 'bg-emerald-50 px-5 py-1 rounded-full' : '' %>">
-                    <i class="fas fa-home text-xl mb-0.5 transition-transform group-active:scale-90"></i>
-                </div>
-                <span class="text-[11px] font-bold">Home</span>
-            </a>
+    <%- include('bottom-nav') %>
+        <% } %>
 
-            <!-- 2. Pantry (Inventory) -->
-            <a href="/inventory/fresh"
-                class="flex flex-col items-center gap-1 min-w-[64px] transition-colors group <%= typeof title !='undefined' && title.includes('Inventory') ? 'text-emerald-600' : 'text-gray-400 hover:text-gray-600' %>">
-                <div
-                    class="<%= typeof title !='undefined' && title.includes('Inventory') ? 'bg-emerald-50 px-5 py-1 rounded-full' : '' %>">
-                    <i class="fas fa-box text-xl mb-0.5 transition-transform group-active:scale-90"></i>
-                </div>
-                <span class="text-[11px] font-bold">Pantry</span>
-            </a>
+            <script>
+                // Auto-dismiss flash messages after 4 seconds
+                setTimeout(() => {
+                    const alerts = document.querySelectorAll('[role="alert"]');
+                    alerts.forEach(alert => {
+                        alert.style.opacity = '0';
+                        setTimeout(() => alert.remove(), 500);
+                    });
+                }, 4000);
+            </script>
+            </body>
 
-            <!-- 3. Cook (Recipes) -->
-            <a href="/recipes"
-                class="flex flex-col items-center gap-1 min-w-[64px] transition-colors group <%= typeof title !='undefined' && title.includes('Recipes') ? 'text-emerald-600' : 'text-gray-400 hover:text-gray-600' %>">
-                <div
-                    class="<%= typeof title !='undefined' && title.includes('Recipes') ? 'bg-emerald-50 px-5 py-1 rounded-full' : '' %>">
-                    <i class="fas fa-utensils text-xl mb-0.5 transition-transform group-active:scale-90"></i>
-                </div>
-                <span class="text-[11px] font-bold">Cook</span>
-            </a>
-
-            <!-- 4. Me (Profile) -->
-            <a href="/profile"
-                class="flex flex-col items-center gap-1 min-w-[64px] transition-colors group <%= typeof title !='undefined' && title.includes('Profile') ? 'text-emerald-600' : 'text-gray-400 hover:text-gray-600' %>">
-                <div
-                    class="<%= typeof title !='undefined' && title.includes('Profile') ? 'bg-emerald-50 px-5 py-1 rounded-full' : '' %>">
-                    <i class="fas fa-user text-xl mb-0.5 transition-transform group-active:scale-90"></i>
-                </div>
-                <span class="text-[11px] font-bold">Me</span>
-            </a>
-        </div>
-    </nav>
-    <!-- Spacer for safe area -->
-    <div class="md:hidden h-24 w-full"></div>
-    <% } %>
-
-        <script>
-            // Auto-dismiss flash messages after 4 seconds
-            setTimeout(() => {
-                const alerts = document.querySelectorAll('[role="alert"]');
-                alerts.forEach(alert => {
-                    alert.style.opacity = '0';
-                    setTimeout(() => alert.remove(), 500);
-                });
-            }, 4000);
-        </script>
-        </body>
-
-        </html>
+            </html>

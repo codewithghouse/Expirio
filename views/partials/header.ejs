@@ -52,90 +52,75 @@
 
                                 <!-- Mobile Header (Logo + Alerts) -->
                                 <nav
-                                    class="md:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-50">
-                                    <div class="px-5 h-16 flex justify-between items-center">
-                                        <a href="/dashboard" class="flex items-center">
+                                    class="md:hidden sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 transition-colors duration-300">
+                                    <div class="px-6 h-14 flex justify-between items-center">
+                                        <!-- Brand -->
+                                        <a href="/dashboard" class="flex items-center gap-2 group">
+                                            <div
+                                                class="w-8 h-8 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white shadow-brand-200 shadow-lg">
+                                                <i class="fas fa-leaf text-sm"></i>
+                                            </div>
                                             <span
-                                                class="text-2xl font-bold text-emerald-600 tracking-tight">Expirio</span>
+                                                class="text-xl font-bold text-gray-800 tracking-tight group-hover:text-brand-600 transition-colors">Expirio</span>
                                         </a>
+
+                                        <!-- Actions -->
                                         <% if(typeof user !='undefined' ) { %>
-                                            <a href="/alerts"
-                                                class="relative w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 text-gray-600 hover:text-emerald-600 active:bg-gray-100 transition-colors">
-                                                <i class="fas fa-bell text-lg"></i>
-                                                <% if(typeof stats !='undefined' && stats.unreadAlerts> 0) { %>
-                                                    <span
-                                                        class="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-white"></span>
-                                                    <% } %>
-                                            </a>
+                                            <div class="flex items-center gap-3">
+                                                <a href="/alerts"
+                                                    class="relative w-9 h-9 flex items-center justify-center rounded-full bg-gray-50 text-gray-500 hover:text-brand-600 hover:bg-brand-50 transition-all">
+                                                    <i class="far fa-bell text-lg"></i>
+                                                    <% if(typeof stats !='undefined' && stats.unreadAlerts> 0) { %>
+                                                        <span
+                                                            class="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+                                                        <% } %>
+                                                </a>
+                                            </div>
                                             <% } %>
                                     </div>
                                 </nav>
 
-                                <!-- Desktop Header (Original) -->
-                                <nav class="bg-white border-b border-gray-200 hidden md:block">
+                                <!-- Desktop Header -->
+                                <nav class="bg-white border-b border-gray-100 hidden md:block sticky top-0 z-50">
                                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                                        <div class="flex justify-between h-16">
+                                        <div class="flex justify-between h-20"> <!-- Increased height -->
                                             <div class="flex">
-                                                <div class="flex-shrink-0 flex items-center">
-                                                    <a href="/dashboard" class="flex items-center">
-                                                        <span
-                                                            class="text-2xl font-bold text-emerald-600 tracking-tight">Expirio</span>
-                                                    </a>
+                                                <div class="flex-shrink-0 flex items-center gap-2">
+                                                    <div
+                                                        class="w-8 h-8 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white shadow-sm">
+                                                        <i class="fas fa-leaf text-sm"></i>
+                                                    </div>
+                                                    <a href="/dashboard"
+                                                        class="text-2xl font-bold text-gray-900 tracking-tight">Expirio</a>
                                                 </div>
                                                 <% if(typeof user !='undefined' ) { %>
-                                                    <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
+                                                    <div class="hidden sm:-my-px sm:ml-10 sm:flex sm:space-x-8">
                                                         <a href="/dashboard"
-                                                            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                                            class="<%= path === '/dashboard' ? 'border-brand-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %> inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors">
                                                             Dashboard
                                                         </a>
                                                         <a href="/inventory/fresh"
-                                                            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                                                            Fresh
-                                                        </a>
-                                                        <a href="/inventory/expiring"
-                                                            class="border-transparent text-gray-500 hover:border-yellow-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                                                            Expiring
-                                                        </a>
-                                                        <a href="/inventory/expired"
-                                                            class="border-transparent text-gray-500 hover:border-red-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                                                            Expired
-                                                        </a>
-                                                        <a href="/alerts"
-                                                            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                                                            Alerts
+                                                            class="<%= path && path.includes('/inventory') ? 'border-brand-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %> inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors">
+                                                            My Pantry
                                                         </a>
                                                         <a href="/recipes"
-                                                            class="border-transparent text-gray-500 hover:text-indigo-600 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                                            class="<%= path && path.includes('/recipes') ? 'border-brand-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %> inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors">
                                                             Recipes
                                                         </a>
-                                                        <a href="/plans"
-                                                            class="border-transparent text-gray-500 hover:text-indigo-600 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                                                            Pricing
+                                                        <a href="/alerts"
+                                                            class="<%= path && path.includes('/alerts') ? 'border-brand-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %> inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors">
+                                                            Alerts
                                                         </a>
                                                     </div>
                                                     <% } %>
                                             </div>
                                             <% if(typeof user !='undefined' ) { %>
                                                 <div class="hidden sm:ml-6 sm:flex sm:items-center">
-                                                    <a href="/alerts"
-                                                        class="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 relative">
-                                                        <span class="sr-only">View notifications</span>
-                                                        <i class="fas fa-bell"></i>
-                                                        <% if(typeof stats !='undefined' && stats.unreadAlerts> 0) { %>
-                                                            <span
-                                                                class="absolute top-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white bg-red-400"></span>
-                                                            <% } %>
-                                                    </a>
-
-                                                    <!-- Profile Dropdown -->
-                                                    <div class="ml-3 relative flex items-center space-x-4">
-                                                        <span class="text-sm font-medium text-gray-700">
-                                                            <%= user.name %>
-                                                        </span>
-                                                        <a href="/auth/logout"
-                                                            class="text-sm text-gray-500 hover:text-red-600 transition-colors">
-                                                            <i class="fas fa-sign-out-alt"></i> Logout
-                                                        </a>
+                                                    <a href="/auth/logout"
+                                                        class="px-4 py-2 text-sm text-gray-500 hover:text-brand-600 transition-colors font-medium">Logout</a>
+                                                    <div
+                                                        class="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 font-semibold text-sm">
+                                                        <%= user.name.charAt(0).toUpperCase() %>
                                                     </div>
                                                 </div>
                                                 <% } else { %>
@@ -143,11 +128,13 @@
                                                         <a href="/auth/login"
                                                             class="text-sm font-medium text-gray-500 hover:text-gray-900">Login</a>
                                                         <a href="/auth/register"
-                                                            class="text-sm font-medium text-emerald-600 hover:text-emerald-500">Register</a>
+                                                            class="px-4 py-2 rounded-xl bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 shadow-lg shadow-brand-200 transition-all">Get
+                                                            Started</a>
                                                     </div>
                                                     <% } %>
                                         </div>
                                     </div>
                                 </nav>
+
                                 <!-- Apply safe mobile padding to Main -->
                                 <main class="flex-grow w-full pb-[80px] md:pb-0">

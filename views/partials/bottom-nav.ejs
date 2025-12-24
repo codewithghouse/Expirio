@@ -1,0 +1,81 @@
+<% // Helper for active state const isActive=(p)=> {
+    if (typeof path === 'undefined') return false;
+    if (path === p) return true;
+    if (p !== '/dashboard' && path && path.startsWith(p)) return true;
+    return false;
+    };
+    %>
+
+    <nav
+        class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] pb-safe transition-all duration-300">
+        <div class="flex justify-around items-end h-[70px] px-2 pb-2">
+            <!-- Home -->
+            <a href="/dashboard"
+                class="group flex flex-col items-center justify-end w-16 mb-2 space-y-1 transition-colors duration-200">
+                <div
+                    class="relative p-1 rounded-xl transition-all duration-300 <%= isActive('/dashboard') ? 'text-brand-600 -translate-y-1' : 'text-gray-400 group-hover:text-gray-600' %>">
+                    <i class="fas fa-home text-2xl"></i>
+                    <% if(isActive('/dashboard')) { %>
+                        <span
+                            class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand-600 rounded-full"></span>
+                        <% } %>
+                </div>
+                <span
+                    class="text-[10px] font-semibold tracking-wide <%= isActive('/dashboard') ? 'text-brand-600' : 'text-gray-400 group-hover:text-gray-600' %>">Home</span>
+            </a>
+
+            <!-- Inventory -->
+            <a href="/inventory/fresh"
+                class="group flex flex-col items-center justify-end w-16 mb-2 space-y-1 transition-colors duration-200">
+                <div
+                    class="relative p-1 rounded-xl transition-all duration-300 <%= isActive('/inventory') ? 'text-brand-600 -translate-y-1' : 'text-gray-400 group-hover:text-gray-600' %>">
+                    <i class="fas fa-box-open text-2xl"></i>
+                    <% if(isActive('/inventory')) { %>
+                        <span
+                            class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand-600 rounded-full"></span>
+                        <% } %>
+                </div>
+                <span
+                    class="text-[10px] font-semibold tracking-wide <%= isActive('/inventory') ? 'text-brand-600' : 'text-gray-400 group-hover:text-gray-600' %>">Pantry</span>
+            </a>
+
+            <!-- SCAN FAB -->
+            <div class="relative -top-6 group">
+                <a href="/inventory/add"
+                    class="flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-600 text-brand-50 shadow-lg shadow-brand-200 hover:scale-105 active:scale-95 transition-all duration-300 border-4 border-gray-50/50">
+                    <i class="fas fa-plus text-2xl"></i>
+                </a>
+                <span class="sr-only">Scan Item</span>
+            </div>
+
+            <!-- Recipes -->
+            <a href="/recipes"
+                class="group flex flex-col items-center justify-end w-16 mb-2 space-y-1 transition-colors duration-200">
+                <div
+                    class="relative p-1 rounded-xl transition-all duration-300 <%= isActive('/recipes') ? 'text-brand-600 -translate-y-1' : 'text-gray-400 group-hover:text-gray-600' %>">
+                    <i class="fas fa-utensils text-2xl"></i>
+                    <% if(isActive('/recipes')) { %>
+                        <span
+                            class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand-600 rounded-full"></span>
+                        <% } %>
+                </div>
+                <span
+                    class="text-[10px] font-semibold tracking-wide <%= isActive('/recipes') ? 'text-brand-600' : 'text-gray-400 group-hover:text-gray-600' %>">Cook</span>
+            </a>
+
+            <!-- Profile/Plans -->
+            <a href="/plans"
+                class="group flex flex-col items-center justify-end w-16 mb-2 space-y-1 transition-colors duration-200">
+                <div
+                    class="relative p-1 rounded-xl transition-all duration-300 <%= isActive('/plans') ? 'text-brand-600 -translate-y-1' : 'text-gray-400 group-hover:text-gray-600' %>">
+                    <i class="fas fa-user-circle text-2xl"></i>
+                    <% if(isActive('/plans')) { %>
+                        <span
+                            class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand-600 rounded-full"></span>
+                        <% } %>
+                </div>
+                <span
+                    class="text-[10px] font-semibold tracking-wide <%= isActive('/plans') ? 'text-brand-600' : 'text-gray-400 group-hover:text-gray-600' %>">Profile</span>
+            </a>
+        </div>
+    </nav>
