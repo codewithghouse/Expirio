@@ -6,92 +6,133 @@
     <!-- Barcode Scanner Library -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
-    <!-- Sticky Search Header (Mobile) -->
-    <div class="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm md:hidden" id="sticky-header">
-        <div class="px-4 py-3 flex items-center gap-3">
-            <!-- Search Input -->
-            <div class="flex-1 relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fas fa-search text-gray-400"></i>
-                </div>
-                <input type="text" id="app-search-input"
-                    class="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl leading-5 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm transition-colors"
-                    placeholder="Search your items..." autocomplete="off">
-            </div>
 
-            <!-- Filter Toggle -->
-            <button onclick="openSortFilter()"
-                class="flex-shrink-0 bg-gray-50 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 p-3 rounded-xl border border-gray-200 focus:outline-none transition-colors relative">
-                <i class="fas fa-filter text-lg"></i>
-                <span id="filter-active-indicator"
-                    class="hidden absolute top-2 right-2 w-2 h-2 bg-emerald-500 rounded-full border border-white"></span>
+    <!-- Sticky Search Header (Mobile) -->
+    <div class="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-50 md:hidden" id="sticky-header">
+        <div class="px-5 pt-5 pb-2">
+            <div class="flex items-center gap-3">
+                <!-- Search Input -->
+                <div class="flex-1 relative shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400 text-lg"></i>
+                    </div>
+                    <input type="text" id="app-search-input"
+                        class="block w-full pl-12 pr-4 py-3.5 border-none rounded-[1.5rem] bg-gray-100/80 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-0 focus:bg-gray-100 transition-all font-medium text-sm"
+                        placeholder="Search Store" autocomplete="off">
+                </div>
+
+                <!-- Filter Toggle -->
+                <button onclick="openSortFilter()"
+                    class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-gray-100/80 text-gray-600 hover:text-emerald-600 rounded-[1.2rem] focus:outline-none active:scale-95 transition-all relative">
+                    <i class="fas fa-sliders-h text-lg"></i>
+                    <span id="filter-active-indicator"
+                        class="hidden absolute top-3 right-3 w-2 h-2 bg-emerald-500 rounded-full border-2 border-white"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Horizontal Categories (Mobile) -->
+        <div class="pl-5 pb-4 pt-2 overflow-x-auto no-scrollbar flex items-center gap-3">
+            <button onclick="filterByCategory('all')"
+                class="cat-pill whitespace-nowrap px-6 py-2.5 rounded-full bg-emerald-600 text-white text-sm font-bold shadow-lg shadow-emerald-200/50 transition-all transform active:scale-95 border border-transparent">
+                All Items
+            </button>
+            <button onclick="filterByCategory('fresh')"
+                class="cat-pill whitespace-nowrap px-6 py-2.5 rounded-full bg-white text-gray-600 border border-gray-100 text-sm font-bold shadow-sm transition-all transform active:scale-95 active:bg-gray-50">
+                Fresh
+            </button>
+            <button onclick="filterByCategory('expiring')"
+                class="cat-pill whitespace-nowrap px-6 py-2.5 rounded-full bg-white text-gray-600 border border-gray-100 text-sm font-bold shadow-sm transition-all transform active:scale-95 active:bg-gray-50">
+                Expiring
+            </button>
+            <button onclick="filterByCategory('expired')"
+                class="cat-pill whitespace-nowrap px-6 py-2.5 rounded-full bg-white text-gray-600 border border-gray-100 text-sm font-bold shadow-sm transition-all transform active:scale-95 active:bg-gray-50">
+                Expired
             </button>
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-32 pt-2">
+    <!-- Main Content Area -->
+    <div class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pb-32">
         <% if (items.length===0) { %>
             <!-- Empty State -->
-            <div class="text-center py-12 bg-white rounded-xl border border-gray-100 mt-4 mx-4">
-                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gray-50 mb-4">
-                    <i class="fas fa-box-open text-gray-400 text-3xl"></i>
+            <div
+                class="text-center py-16 bg-white rounded-[2rem] border border-gray-50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] mt-4">
+                <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-emerald-50 mb-6">
+                    <i class="fas fa-carrot text-emerald-400 text-3xl"></i>
                 </div>
-                <h3 class="mt-2 text-base font-bold text-gray-900">Pantry is empty</h3>
-                <p class="mt-1 text-sm text-gray-500">Scan or add items to track freshness.</p>
-                <div class="mt-6">
-                    <!-- Trigger Modal -->
+                <h3 class="mt-2 text-lg font-bold text-gray-900">No Items Yet</h3>
+                <p class="mt-2 text-sm text-gray-400 px-8 leading-relaxed">Your pantry is empty. Add your first grocery
+                    item to start tracking.</p>
+                <div class="mt-8">
                     <button onclick="openModal()"
-                        class="inline-flex items-center px-6 py-3 border border-transparent shadow-sm text-sm font-bold rounded-full text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 active:scale-95 transition-transform">
-                        <i class="fas fa-plus mr-2"></i> Add First Item
+                        class="inline-flex items-center px-8 py-4 border border-transparent shadow-lg shadow-emerald-200 text-sm font-bold rounded-full text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none active:scale-95 transition-all">
+                        <i class="fas fa-plus mr-2"></i> Add Item
                     </button>
                 </div>
             </div>
             <% } else { %>
-                <!-- SPLIT LAYOUTS: Mobile vs Desktop -->
 
-                <!-- MOBILE LAYOUT: Vertical Card Stack (md:hidden) -->
-                <!-- Strict Vertical List for robustness on small screens -->
-                <div id="mobile-inventory-list" class="flex flex-col gap-3 md:hidden pt-2 pb-24">
-                    <% items.forEach(function(item) { /* Shared Logic Block */ const today=new Date(); const expiry=new
+                <!-- MOBILE LAYOUT: New Row Card Design (md:hidden) -->
+                <div id="mobile-inventory-list" class="flex flex-col gap-4 md:hidden pt-2">
+                    <!-- Dynamic Headers for sections can be added via JS, keeping it simple list for now -->
+
+                    <% items.forEach(function(item) { /* Logic Block */ const today=new Date(); const expiry=new
                         Date(item.expiryDate); const diffTime=expiry.getTime() - today.getTime(); const
                         diffDays=Math.ceil(diffTime / (1000 * 60 * 60 * 24)); let expiryText="" ; let
-                        expiryColor="text-gray-500" ; let statusSortValue=0; if (diffDays> 0) {
-                        expiryText = "Expires in " + diffDays + (diffDays !== 1 ? " days" : " day");
-                        if (diffDays <= 3) { expiryColor="text-amber-600" ; statusSortValue=2; } else {
-                            expiryColor="text-emerald-600" ; statusSortValue=3; } } else if (diffDays===0) {
-                            expiryText="Expires today" ; expiryColor="text-orange-600" ; statusSortValue=1; } else {
-                            expiryText="Expired " + Math.abs(diffDays) + (Math.abs(diffDays) !==1 ? " days" : " day" )
-                            + " ago" ; expiryColor="text-red-600" ; statusSortValue=0; } %>
-                            <div class="inventory-item w-full bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center justify-between"
+                        expiryColor="text-gray-400" ; let iconBg="bg-gray-50" ; let statusSortValue=0; if (diffDays> 0)
+                        {
+                        expiryText = diffDays + (diffDays !== 1 ? " days" : " day") + " left";
+                        if (diffDays <= 3) { expiryColor="text-amber-500" ; iconBg="bg-amber-50" ; statusSortValue=2; }
+                            else { expiryColor="text-emerald-500" ; iconBg="bg-emerald-50" ; statusSortValue=3; } } else
+                            if (diffDays===0) { expiryText="Expires TODAY" ; expiryColor="text-orange-500" ;
+                            iconBg="bg-orange-50" ; statusSortValue=1; } else { expiryText="Expired " +
+                            Math.abs(diffDays) + "d ago" ; expiryColor="text-red-500" ; iconBg="bg-red-50" ;
+                            statusSortValue=0; } %>
+                            <div class="inventory-item w-full bg-white rounded-[1.8rem] p-4 flex items-center justify-between shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-50/50"
                                 data-name="<%= item.name.toLowerCase() %>" data-id="<%= item._id %>"
                                 data-status-val="<%= statusSortValue %>" data-expiry-days="<%= diffDays %>"
                                 data-category="unknown">
 
-                                <div class="flex items-center flex-1 min-w-0">
+                                <!-- Left: Icon & Text -->
+                                <div class="flex items-center flex-1 min-w-0 gap-4">
+                                    <!-- Icon Box -->
                                     <div
-                                        class="flex-shrink-0 w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-2xl mr-4">
-                                        <span class="item-icon">📦</span>
+                                        class="flex-shrink-0 w-[3.5rem] h-[3.5rem] <%= iconBg %> rounded-2xl flex items-center justify-center text-2xl shadow-sm">
+                                        <span class="item-icon transform -rotate-6">
+                                            <% if(item.name.toLowerCase().includes('apple')) { %>🍎<% } else
+                                                    if(item.name.toLowerCase().includes('banana')) { %>🍌<% } else
+                                                        if(item.name.toLowerCase().includes('milk')) { %>🥛<% } else
+                                                            if(item.name.toLowerCase().includes('bread')) { %>🍞<% }
+                                                                else if(item.name.toLowerCase().includes('carrot')) { %>
+                                                                🥕<% } else { %>📦<% } %>
+                                        </span>
                                     </div>
-                                    <div class="flex-1 min-w-0">
-                                        <h3 class="text-base font-bold text-gray-900 truncate capitalize">
+
+                                    <!-- Text Info -->
+                                    <div class="flex-1 min-w-0 flex flex-col justify-center">
+                                        <h3
+                                            class="text-[17px] font-bold text-gray-800 leading-tight truncate capitalize mb-0.5">
                                             <%= item.name %>
                                         </h3>
-                                        <p class="text-xs font-medium <%= expiryColor %> flex items-center mt-1">
-                                            <i class="far fa-clock mr-1"></i>
-                                            <%= expiryText %>
-                                        </p>
+                                        <div class="flex items-center text-xs font-semibold gap-2">
+                                            <span class="<%= expiryColor %>">
+                                                <%= expiryText %>
+                                            </span>
+                                            <span class="w-1 h-1 rounded-full bg-gray-300"></span>
+                                            <span class="text-gray-400">
+                                                <%= item.quantity %> pcs
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="flex items-center ml-4">
-                                    <span class="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded-lg">x<%=
-                                            item.quantity %></span>
-                                    <form action="/inventory/<%= item._id %>?_method=DELETE" method="POST"
-                                        onsubmit="return confirm('Remove?');" class="ml-3">
-                                        <button type="submit" class="text-gray-300 hover:text-red-500 p-2">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
+                                <!-- Right: Action Button -->
+                                <div class="flex items-center ml-2">
+                                    <button onclick="openItemActionSheet('<%= item._id %>', '<%= item.name %>')"
+                                        class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center active:scale-90 transition-transform shadow-sm border border-emerald-100/50">
+                                        <i class="fas fa-plus text-sm"></i>
+                                    </button>
                                 </div>
                             </div>
                             <% }); %>
